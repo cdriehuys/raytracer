@@ -116,6 +116,30 @@ impl Tuple {
     pub fn magnitude(&self) -> f64 {
         (self.x.powi(2) + self.y.powi(2) + self.z.powi(2) + self.w.powi(2)).sqrt()
     }
+
+    /// Compute the normalized version of a vector which is a vector that has
+    /// the same direction as the original, but is scaled to have a magnitude of
+    /// `1`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use raytracer::Tuple;
+    /// let vector = Tuple::new_vector(1, 2, 3);
+    /// let norm = vector.normalized();
+    ///
+    /// assert_eq!(norm.magnitude(), 1.0);
+    /// ```
+    pub fn normalized(&self) -> Self {
+        let magnitude = self.magnitude();
+
+        Tuple{
+            x: self.x / magnitude,
+            y: self.y / magnitude,
+            z: self.z / magnitude,
+            w: self.w / magnitude,
+        }
+    }
 }
 
 impl ops::Add for Tuple {
