@@ -1,4 +1,5 @@
 use float_cmp::approx_eq;
+use std::ops;
 
 /// A tuple represents a point or vector.
 #[derive(Debug)]
@@ -25,8 +26,13 @@ impl Tuple {
     /// # use raytracer::Tuple;
     /// let point = Tuple::new_point(1.0, 2.0, 3.0);
     /// ```
-    pub fn new_point(x: f64, y: f64, z: f64) -> Self {
-        Self{x: x, y: y, z: z, w: 1.0}
+    pub fn new_point<T: Into<f64>>(x: T, y: T, z: T) -> Self {
+        Self {
+            x: x.into(),
+            y: y.into(),
+            z: z.into(),
+            w: 1.0,
+        }
     }
 
     /// Construct a new tuple that represents a vector.
@@ -43,8 +49,13 @@ impl Tuple {
     /// # use raytracer::Tuple;
     /// let vector = Tuple::new_vector(1.0, 2.0, 3.0);
     /// ```
-    pub fn new_vector(x: f64, y: f64, z: f64) -> Self {
-        Self{x: x, y: y, z: z, w: 0.0}
+    pub fn new_vector<T: Into<f64>>(x: T, y: T, z: T) -> Self {
+        Self {
+            x: x.into(),
+            y: y.into(),
+            z: z.into(),
+            w: 0.0,
+        }
     }
 
     /// Determine if a tuple represents a point.
@@ -86,6 +97,118 @@ impl Tuple {
     }
 }
 
+impl ops::Add for Tuple {
+    type Output = Self;
+
+    /// Add another tuple to the current one.
+    ///
+    /// # Arguments
+    ///
+    /// * `rhs` - The tuple to add.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use raytracer::Tuple;
+    /// let point = Tuple::new_point(3, -2, 5);
+    /// let vector = Tuple::new_vector(-2, 3, 1);
+    ///
+    /// let want = Tuple::new_point(1, 1, 6);
+    ///
+    /// assert_eq!(point + vector, want);
+    /// ```
+    fn add(self, rhs: Self) -> Self {
+        Tuple {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+            z: self.z + rhs.z,
+            w: self.w + rhs.w,
+        }
+    }
+}
+
+impl ops::Neg for Tuple {
+    type Output = Self;
+
+    /// Negate a tuple. This only makes sense for vectors.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use raytracer::Tuple;
+    /// let a = Tuple::new_vector(1, -2, 3);
+    /// let b = Tuple::new_vector(-1, 2, -3);
+    ///
+    /// assert_eq!(-a, b);
+    /// ```
+    fn neg(self) -> Self {
+        Tuple {
+            x: -self.x,
+            y: -self.y,
+            z: -self.z,
+            w: -self.w,
+        }
+    }
+}
+
+impl ops::Sub for Tuple {
+    type Output = Self;
+
+    /// Subtract another tuple from the current tuple.
+    ///
+    /// # Arguments
+    ///
+    /// `rhs` - The tuple to subtract from the current one.
+    ///
+    /// # Examples
+    ///
+    /// Subtracting two points gives the vector between them:
+    ///
+    /// ```
+    /// # use raytracer::Tuple;
+    /// let p1 = Tuple::new_point(3, 2, 1);
+    /// let p2 = Tuple::new_point(5, 6, 7);
+    ///
+    /// let want = Tuple::new_vector(-2, -4, -6);
+    ///
+    /// assert_eq!(p1 - p2, want);
+    /// ```
+    ///
+    /// Subtracting a vector from a point gives the result of moving backwards
+    /// by the given vector from the starting point:
+    ///
+    /// ```
+    /// # use raytracer::Tuple;
+    /// let point = Tuple::new_point(3, 2, 1);
+    /// let vector = Tuple::new_vector(5, 6, 7);
+    ///
+    /// let want = Tuple::new_point(-2, -4, -6);
+    ///
+    /// assert_eq!(point - vector, want);
+    /// ```
+    ///
+    /// Subtracting a vector from a vector gives the difference in direction
+    /// between the two:
+    ///
+    /// ```
+    /// # use raytracer::Tuple;
+    /// let v1 = Tuple::new_vector(3, 2, 1);
+    /// let v2 = Tuple::new_vector(5, 6, 7);
+    ///
+    /// let want = Tuple::new_vector(-2, -4, -6);
+    ///
+    /// assert_eq!(v1 - v2, want);
+    /// ```
+    fn sub(self, rhs: Self) -> Self {
+        Tuple {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+            z: self.z - rhs.z,
+            w: self.w - rhs.w,
+        }
+    }
+}
+
 impl PartialEq for Tuple {
     fn eq(&self, other: &Self) -> bool {
         approx_eq!(f64, self.x, other.x, ulps = 2)
@@ -96,44 +219,8 @@ impl PartialEq for Tuple {
 }
 
 #[cfg(test)]
-mod test_tuple {
+mod tests {
     use super::*;
-
-    #[test]
-    fn is_point() {
-        let point = Tuple {
-            x: 4.3,
-            y: -4.2,
-            z: 3.1,
-            w: 1.0,
-        };
-
-        assert_eq!(point.x, 4.3);
-        assert_eq!(point.y, -4.2);
-        assert_eq!(point.z, 3.1);
-        assert_eq!(point.w, 1.0);
-
-        assert!(point.is_point());
-        assert!(!point.is_vector());
-    }
-
-    #[test]
-    fn is_vector() {
-        let vector = Tuple {
-            x: 4.3,
-            y: -4.2,
-            z: 3.1,
-            w: 0.0,
-        };
-
-        assert_eq!(vector.x, 4.3);
-        assert_eq!(vector.y, -4.2);
-        assert_eq!(vector.z, 3.1);
-        assert_eq!(vector.w, 0.0);
-
-        assert!(vector.is_vector());
-        assert!(!vector.is_point());
-    }
 
     #[test]
     fn equal_mismatched_x() {
@@ -245,7 +332,12 @@ mod test_tuple {
 
     #[test]
     fn point_creation() {
-        let want = Tuple{x: 1.2, y: -3.4, z: 5.6, w: 1.0};
+        let want = Tuple {
+            x: 1.2,
+            y: -3.4,
+            z: 5.6,
+            w: 1.0,
+        };
 
         let got = Tuple::new_point(want.x, want.y, want.z);
 
@@ -254,10 +346,33 @@ mod test_tuple {
 
     #[test]
     fn vector_creation() {
-        let want = Tuple{x: 1.2, y: -3.4, z: 5.6, w: 0.0};
+        let want = Tuple {
+            x: 1.2,
+            y: -3.4,
+            z: 5.6,
+            w: 0.0,
+        };
 
         let got = Tuple::new_vector(want.x, want.y, want.z);
 
         assert_eq!(got, want);
+    }
+
+    #[test]
+    fn tuple_negation() {
+        let a = Tuple {
+            x: 1.0,
+            y: -2.0,
+            z: 3.0,
+            w: -4.0,
+        };
+        let b = Tuple {
+            x: -1.0,
+            y: 2.0,
+            z: -3.0,
+            w: 4.0,
+        };
+
+        assert_eq!(-a, b);
     }
 }
