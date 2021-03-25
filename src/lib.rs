@@ -70,6 +70,7 @@ impl Tuple {
     /// assert!(point.is_point());
     /// assert!(!vector.is_point());
     /// ```
+    #[allow(clippy::float_cmp)]
     pub fn is_point(&self) -> bool {
         // We use exact equality because a point is always constructed with the
         // literal 1.0 which can be exactly represented, so there is no chance
@@ -94,6 +95,26 @@ impl Tuple {
         // literal 0.0 which can be exactly represented, so there is no chance
         // for floating point rounding to affect this operation.
         self.w == 0.0
+    }
+
+    /// Find the magnitude, or length, of the tuple.
+    ///
+    /// # Examples
+    ///
+    /// Unit vectors all have a magnitude of 1.
+    ///
+    /// ```
+    /// # use raytracer::Tuple;
+    /// let x = Tuple::new_vector(1, 0, 0);
+    /// let y = Tuple::new_vector(0, 1, 0);
+    /// let z = Tuple::new_vector(0, 0, 1);
+    ///
+    /// assert_eq!(x.magnitude(), 1.0);
+    /// assert_eq!(y.magnitude(), 1.0);
+    /// assert_eq!(z.magnitude(), 1.0);
+    /// ```
+    pub fn magnitude(&self) -> f64 {
+        (self.x.powi(2) + self.y.powi(2) + self.z.powi(2) + self.w.powi(2)).sqrt()
     }
 }
 
@@ -150,7 +171,12 @@ impl<T: Into<f64>> ops::Div<T> for Tuple {
     fn div(self, rhs: T) -> Self {
         let scalar = rhs.into();
 
-        Tuple{x: self.x / scalar, y: self.y / scalar, z: self.z / scalar, w: self.w / scalar }
+        Tuple {
+            x: self.x / scalar,
+            y: self.y / scalar,
+            z: self.z / scalar,
+            w: self.w / scalar,
+        }
     }
 }
 
@@ -177,7 +203,12 @@ impl<T: Into<f64>> ops::Mul<T> for Tuple {
     fn mul(self, rhs: T) -> Self {
         let scalar = rhs.into();
 
-        Tuple{x: self.x * scalar, y: self.y * scalar, z: self.z * scalar, w: self.w * scalar}
+        Tuple {
+            x: self.x * scalar,
+            y: self.y * scalar,
+            z: self.z * scalar,
+            w: self.w * scalar,
+        }
     }
 }
 
@@ -432,30 +463,60 @@ mod tests {
 
     #[test]
     fn tuple_multiply_by_scalar() {
-        let tuple = Tuple {x: 1.0, y: -2.0, z: 3.0, w: -4.0};
+        let tuple = Tuple {
+            x: 1.0,
+            y: -2.0,
+            z: 3.0,
+            w: -4.0,
+        };
         let scalar = 3.5;
 
-        let want = Tuple {x: 3.5, y: -7.0, z: 10.5, w: -14.0};
+        let want = Tuple {
+            x: 3.5,
+            y: -7.0,
+            z: 10.5,
+            w: -14.0,
+        };
 
         assert_eq!(tuple * scalar, want);
     }
 
     #[test]
     fn tuple_multiply_by_fractional_scalar() {
-        let tuple = Tuple {x: 1.0, y: -2.0, z: 3.0, w: -4.0};
+        let tuple = Tuple {
+            x: 1.0,
+            y: -2.0,
+            z: 3.0,
+            w: -4.0,
+        };
         let scalar = 0.5;
 
-        let want = Tuple {x: 0.5, y: -1.0, z: 1.5, w: -2.0};
+        let want = Tuple {
+            x: 0.5,
+            y: -1.0,
+            z: 1.5,
+            w: -2.0,
+        };
 
         assert_eq!(tuple * scalar, want);
     }
 
     #[test]
     fn tuple_divide_by_scalar() {
-        let tuple = Tuple {x: 1.0, y: -2.0, z: 3.0, w: -4.0};
+        let tuple = Tuple {
+            x: 1.0,
+            y: -2.0,
+            z: 3.0,
+            w: -4.0,
+        };
         let scalar = 2;
 
-        let want = Tuple {x: 0.5, y: -1.0, z: 1.5, w: -2.0};
+        let want = Tuple {
+            x: 0.5,
+            y: -1.0,
+            z: 1.5,
+            w: -2.0,
+        };
 
         assert_eq!(tuple / scalar, want);
     }
