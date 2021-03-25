@@ -127,6 +127,60 @@ impl ops::Add for Tuple {
     }
 }
 
+impl<T: Into<f64>> ops::Div<T> for Tuple {
+    type Output = Self;
+
+    /// Shrink all of a tuple's components by the same scalar factor.
+    ///
+    /// # Arguments
+    ///
+    /// * `rhs` - The factor to shrink each component by.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use raytracer::Tuple;
+    /// let vector = Tuple::new_vector(1, -2, 3);
+    /// let scale = 2;
+    ///
+    /// let want = Tuple::new_vector(0.5, -1.0, 1.5);
+    ///
+    /// assert_eq!(vector / scale, want);
+    /// ```
+    fn div(self, rhs: T) -> Self {
+        let scalar = rhs.into();
+
+        Tuple{x: self.x / scalar, y: self.y / scalar, z: self.z / scalar, w: self.w / scalar }
+    }
+}
+
+impl<T: Into<f64>> ops::Mul<T> for Tuple {
+    type Output = Self;
+
+    /// Scale all of a tuple's components by the same scalar.
+    ///
+    /// # Arguments
+    ///
+    /// * `rhs` - The amount to scale each component by.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use raytracer::Tuple;
+    /// let vector = Tuple::new_vector(1, 2, 3);
+    /// let scale = 2;
+    ///
+    /// let want = Tuple::new_vector(2, 4, 6);
+    ///
+    /// assert_eq!(vector * scale, want);
+    /// ```
+    fn mul(self, rhs: T) -> Self {
+        let scalar = rhs.into();
+
+        Tuple{x: self.x * scalar, y: self.y * scalar, z: self.z * scalar, w: self.w * scalar}
+    }
+}
+
 impl ops::Neg for Tuple {
     type Output = Self;
 
@@ -374,5 +428,35 @@ mod tests {
         };
 
         assert_eq!(-a, b);
+    }
+
+    #[test]
+    fn tuple_multiply_by_scalar() {
+        let tuple = Tuple {x: 1.0, y: -2.0, z: 3.0, w: -4.0};
+        let scalar = 3.5;
+
+        let want = Tuple {x: 3.5, y: -7.0, z: 10.5, w: -14.0};
+
+        assert_eq!(tuple * scalar, want);
+    }
+
+    #[test]
+    fn tuple_multiply_by_fractional_scalar() {
+        let tuple = Tuple {x: 1.0, y: -2.0, z: 3.0, w: -4.0};
+        let scalar = 0.5;
+
+        let want = Tuple {x: 0.5, y: -1.0, z: 1.5, w: -2.0};
+
+        assert_eq!(tuple * scalar, want);
+    }
+
+    #[test]
+    fn tuple_divide_by_scalar() {
+        let tuple = Tuple {x: 1.0, y: -2.0, z: 3.0, w: -4.0};
+        let scalar = 2;
+
+        let want = Tuple {x: 0.5, y: -1.0, z: 1.5, w: -2.0};
+
+        assert_eq!(tuple / scalar, want);
     }
 }
