@@ -2,6 +2,15 @@ use float_cmp::approx_eq;
 use raytracer::Tuple;
 
 #[test]
+fn cross_product_vectors() {
+    let a = Tuple::new_vector(1, 2, 3);
+    let b = Tuple::new_vector(2, 3, 4);
+
+    assert_eq!(a.cross(b), Tuple::new_vector(-1, 2, -1));
+    assert_eq!(b.cross(a), Tuple::new_vector(1, -2, 1));
+}
+
+#[test]
 fn dot_product_vectors() {
     let a = Tuple::new_vector(1, 2, 3);
     let b = Tuple::new_vector(2, 3, 4);

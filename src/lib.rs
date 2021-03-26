@@ -4,7 +4,6 @@ use std::ops;
 const POINT_W: f64 = 1.0;
 const VECTOR_W: f64 = 0.0;
 
-
 /// A tuple represents a point or vector.
 #[derive(Clone, Copy, Debug)]
 pub struct Tuple {
@@ -60,6 +59,20 @@ impl Tuple {
             z: z.into(),
             w: VECTOR_W,
         }
+    }
+
+    /// Compute the cross product of this tuple and another. This only makes
+    /// sense for vectors.
+    ///
+    /// # Arguments
+    ///
+    /// * `rhs` - The vector to compute the cross product with.
+    pub fn cross(&self, rhs: Self) -> Self {
+        Self::new_vector(
+            self.y * rhs.z - self.z * rhs.y,
+            self.z * rhs.x - self.x * rhs.z,
+            self.x * rhs.y - self.y * rhs.x,
+        )
     }
 
     /// Compute the dot product of the current tuple and another.
