@@ -2,6 +2,15 @@ use float_cmp::approx_eq;
 use raytracer::Tuple;
 
 #[test]
+fn dot_product_vectors() {
+    let a = Tuple::new_vector(1, 2, 3);
+    let b = Tuple::new_vector(2, 3, 4);
+
+    assert_eq!(a.dot(b), 20.0);
+    assert_eq!(b.dot(a), 20.0);
+}
+
+#[test]
 fn normalize_x_vector() {
     let vector = Tuple::new_vector(4, 0, 0);
     let want = Tuple::new_vector(1, 0, 0);

@@ -1,8 +1,12 @@
 use float_cmp::approx_eq;
 use std::ops;
 
+const POINT_W: f64 = 1.0;
+const VECTOR_W: f64 = 0.0;
+
+
 /// A tuple represents a point or vector.
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct Tuple {
     x: f64,
     y: f64,
@@ -31,7 +35,7 @@ impl Tuple {
             x: x.into(),
             y: y.into(),
             z: z.into(),
-            w: 1.0,
+            w: POINT_W,
         }
     }
 
@@ -54,8 +58,17 @@ impl Tuple {
             x: x.into(),
             y: y.into(),
             z: z.into(),
-            w: 0.0,
+            w: VECTOR_W,
         }
+    }
+
+    /// Compute the dot product of the current tuple and another.
+    ///
+    /// # Arguments
+    ///
+    /// * `rhs` - The tuple to compute the dot product with.
+    pub fn dot(&self, rhs: Self) -> f64 {
+        self.x * rhs.x + self.y * rhs.y + self.z * rhs.z + self.w * rhs.w
     }
 
     /// Determine if a tuple represents a point.
@@ -70,12 +83,11 @@ impl Tuple {
     /// assert!(point.is_point());
     /// assert!(!vector.is_point());
     /// ```
-    #[allow(clippy::float_cmp)]
     pub fn is_point(&self) -> bool {
         // We use exact equality because a point is always constructed with the
         // literal 1.0 which can be exactly represented, so there is no chance
         // for floating point rounding to affect this operation.
-        self.w == 1.0
+        self.w == POINT_W
     }
 
     /// Determine if a tuple represents a vector.
@@ -94,7 +106,7 @@ impl Tuple {
         // We use exact equality because a vector is always constructed with the
         // literal 0.0 which can be exactly represented, so there is no chance
         // for floating point rounding to affect this operation.
-        self.w == 0.0
+        self.w == VECTOR_W
     }
 
     /// Find the magnitude, or length, of the tuple.
@@ -133,7 +145,7 @@ impl Tuple {
     pub fn normalized(&self) -> Self {
         let magnitude = self.magnitude();
 
-        Tuple{
+        Tuple {
             x: self.x / magnitude,
             y: self.y / magnitude,
             z: self.z / magnitude,
