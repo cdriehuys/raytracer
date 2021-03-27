@@ -1,5 +1,3 @@
-use raytracer;
-
 struct Projectile {
     position: raytracer::Tuple,
     velocity: raytracer::Tuple,
