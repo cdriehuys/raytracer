@@ -1,6 +1,7 @@
 use float_cmp::approx_eq;
 use std::ops;
 
+pub mod canvas;
 pub mod colors;
 
 const POINT_W: f64 = 1.0;
