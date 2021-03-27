@@ -61,6 +61,20 @@ impl Tuple {
         }
     }
 
+    /// Get the tuple's y-component.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use raytracer::Tuple;
+    /// let point = Tuple::new_point(1, 2, 3);
+    ///
+    /// assert_eq!(point.get_y(), 2.0);
+    /// ```
+    pub fn get_y(&self) -> f64 {
+        self.y
+    }
+
     /// Compute the cross product of this tuple and another. This only makes
     /// sense for vectors.
     ///
