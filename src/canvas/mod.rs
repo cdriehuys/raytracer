@@ -1,5 +1,7 @@
 use super::colors::Color;
 
+pub mod renderers;
+
 /// A canvas contains a 2D array of pixels.
 #[derive(Debug)]
 pub struct Canvas {
