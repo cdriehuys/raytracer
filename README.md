@@ -1,5 +1,7 @@
 # raytracer-rs
 
+[![Test](https://github.com/cdriehuys/raytracer/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/cdriehuys/raytracer/actions/workflows/ci.yml)
+
 A ray tracer written in Rust, built by following
 [*The Ray Tracer Challenge* by Jamis Buck][ray-tracer-challenge].
 
