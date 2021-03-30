@@ -64,6 +64,20 @@ impl Tuple {
         }
     }
 
+    /// Get the tuple's x-component.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use raytracer::Tuple;
+    /// let point = Tuple::new_point(1, 2, 3);
+    ///
+    /// assert_eq!(point.x(), 1.0);
+    /// ```
+    pub fn x(&self) -> f64 {
+        self.x
+    }
+
     /// Get the tuple's y-component.
     ///
     /// # Examples
@@ -72,9 +86,9 @@ impl Tuple {
     /// # use raytracer::Tuple;
     /// let point = Tuple::new_point(1, 2, 3);
     ///
-    /// assert_eq!(point.get_y(), 2.0);
+    /// assert_eq!(point.y(), 2.0);
     /// ```
-    pub fn get_y(&self) -> f64 {
+    pub fn y(&self) -> f64 {
         self.y
     }
 
