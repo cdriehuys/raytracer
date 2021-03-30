@@ -1,4 +1,5 @@
 use raytracer::linear::Matrix;
+use raytracer::Tuple;
 
 #[test]
 fn create_2x2() {
@@ -87,4 +88,49 @@ fn equal_different_4x4() {
     );
 
     assert_ne!(a, b);
+}
+
+#[test]
+fn multiply_4x4() {
+    #[rustfmt::skip]
+    let a = Matrix::square_4(
+        1.0, 2.0, 3.0, 4.0,
+        5.0, 6.0, 7.0, 8.0,
+        9.0, 8.0, 7.0, 6.0,
+        5.0, 4.0, 3.0, 2.0,
+    );
+
+    #[rustfmt::skip]
+    let b = Matrix::square_4(
+        -2.0, 1.0, 2.0, 3.0,
+        3.0, 2.0, 1.0, -1.0,
+        4.0, 3.0, 6.0, 5.0,
+        1.0, 2.0, 7.0, 8.0,
+    );
+
+    #[rustfmt::skip]
+    let want = Matrix::square_4(
+        20.0, 22.0, 50.0, 48.0,
+        44.0, 54.0, 114.0, 108.0,
+        40.0, 58.0, 110.0, 102.0,
+        16.0, 26.0, 46.0, 42.0,
+    );
+
+    assert_eq!(a * b, want);
+}
+
+#[test]
+fn multiply_4x4_by_tuple() {
+    #[rustfmt::skip]
+    let a = Matrix::square_4(
+        1.0, 2.0, 3.0, 4.0,
+        2.0, 4.0, 4.0, 2.0,
+        8.0, 6.0, 4.0, 1.0,
+        0.0, 0.0, 0.0, 1.0,
+    );
+    let tuple = Tuple::new(1, 2, 3, 1);
+
+    let want = Tuple::new(18, 24, 33, 1);
+
+    assert_eq!(a * tuple, want);
 }

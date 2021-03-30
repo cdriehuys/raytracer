@@ -19,6 +19,20 @@ pub struct Tuple {
 }
 
 impl Tuple {
+    pub fn new<X: Into<f64>, Y: Into<f64>, Z: Into<f64>, W: Into<f64>>(
+        x: X,
+        y: Y,
+        z: Z,
+        w: W,
+    ) -> Self {
+        Self {
+            x: x.into(),
+            y: y.into(),
+            z: z.into(),
+            w: w.into(),
+        }
+    }
+
     /// Construct a new tuple that represents a point in space.
     ///
     /// # Arguments
@@ -91,6 +105,34 @@ impl Tuple {
     /// ```
     pub fn y(&self) -> f64 {
         self.y
+    }
+
+    /// Get the tuple's z-component.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use raytracer::Tuple;
+    /// let point = Tuple::new_point(1, 2, 3);
+    ///
+    /// assert_eq!(point.z(), 3.0);
+    /// ```
+    pub fn z(&self) -> f64 {
+        self.z
+    }
+
+    /// Get the tuple's w-component.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use raytracer::Tuple;
+    /// let point = Tuple::new_point(1, 2, 3);
+    ///
+    /// assert_eq!(point.w(), 1.0);
+    /// ```
+    pub fn w(&self) -> f64 {
+        self.w
     }
 
     /// Compute the cross product of this tuple and another. This only makes
