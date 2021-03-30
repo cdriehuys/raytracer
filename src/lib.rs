@@ -3,6 +3,7 @@ use std::ops;
 
 pub mod canvas;
 pub mod colors;
+pub mod linear;
 
 const POINT_W: f64 = 1.0;
 const VECTOR_W: f64 = 0.0;
