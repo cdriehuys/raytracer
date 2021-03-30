@@ -8,7 +8,7 @@ pub struct Canvas {
     width: usize,
     height: usize,
 
-    pixels: Vec<Vec<Color>>
+    pixels: Vec<Vec<Color>>,
 }
 
 impl Canvas {
@@ -36,10 +36,10 @@ impl Canvas {
             columns.push(row);
         }
 
-        Self{
+        Self {
             width,
             height,
-            pixels: columns
+            pixels: columns,
         }
     }
 
