@@ -117,6 +117,83 @@ impl Matrix {
         )
     }
 
+    /// Compute the cofactor of a matrix element.
+    ///
+    /// The cofactor is essentially the minor of an element with a possible
+    /// sign flip.
+    ///
+    /// # Arguments
+    ///
+    /// `row` - The row index of the element to find the cofactor of.
+    /// `col` - The column index of the element to find the cofactor of.
+    pub fn cofactor(&self, row: usize, col: usize) -> f64 {
+        if (row + col) % 2 == 0 {
+            self.minor(row, col)
+        } else {
+            -self.minor(row, col)
+        }
+    }
+
+    /// Compute the determinant of the matrix.
+    pub fn determinant(&self) -> f64 {
+        if self.rows == 2 {
+            return self[0][0] * self[1][1] - self[0][1] * self[1][0];
+        }
+
+        let mut determinant = 0.0;
+        for col in 0..self.columns {
+            determinant += self[0][col] * self.cofactor(0, col);
+        }
+
+        determinant
+    }
+
+    /// Compute the minor of a matrix element.
+    ///
+    /// The minor is computed by finding the determinant of the submatrix where
+    /// the row and column of the specified element are removed.
+    ///
+    /// # Arguments
+    ///
+    /// * `row` - The row index of the element to find the minor of.
+    /// * `col` - The column index of the element to find the minor of.
+    pub fn minor(&self, row: usize, col: usize) -> f64 {
+        self.submatrix(row, col).determinant()
+    }
+
+    /// Find the matrix resulting from removing a specific row and column of the
+    /// matrix.
+    ///
+    /// # Arguments
+    ///
+    /// * `remove_row` - The index of the row to omit.
+    /// * `remove_col` - The index of the column to omit.
+    pub fn submatrix(&self, remove_row: usize, remove_col: usize) -> Self {
+        let mut new_rows = Vec::with_capacity(self.rows - 1);
+        for row in 0..self.rows {
+            if row == remove_row {
+                continue;
+            }
+
+            let mut new_columns = Vec::with_capacity(self.columns - 1);
+            for col in 0..self.columns {
+                if col == remove_col {
+                    continue;
+                }
+
+                new_columns.push(self[row][col]);
+            }
+
+            new_rows.push(new_columns);
+        }
+
+        Self {
+            rows: self.rows - 1,
+            columns: self.columns - 1,
+            data: new_rows,
+        }
+    }
+
     /// Create the transpose of the current matrix.
     pub fn transposed(&self) -> Self {
         let mut new_rows = Vec::with_capacity(self.columns);
