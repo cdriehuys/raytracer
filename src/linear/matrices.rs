@@ -105,6 +105,37 @@ impl Matrix {
             ],
         }
     }
+
+    /// The 4x4 identity matrix.
+    #[rustfmt::skip]
+    pub fn identity_4() -> Self {
+        Self::square_4(
+            1.0, 0.0, 0.0, 0.0,
+            0.0, 1.0, 0.0, 0.0,
+            0.0, 0.0, 1.0, 0.0,
+            0.0, 0.0, 0.0, 1.0,
+        )
+    }
+
+    /// Create the transpose of the current matrix.
+    pub fn transposed(&self) -> Self {
+        let mut new_rows = Vec::with_capacity(self.columns);
+        for col in 0..self.columns {
+            let mut new_columns = Vec::with_capacity(self.rows);
+
+            for row in 0..self.rows {
+                new_columns.push(self[row][col]);
+            }
+
+            new_rows.push(new_columns);
+        }
+
+        Self {
+            rows: self.columns,
+            columns: self.rows,
+            data: new_rows,
+        }
+    }
 }
 
 impl PartialEq for Matrix {
@@ -135,10 +166,10 @@ impl ops::Index<usize> for Matrix {
     }
 }
 
-impl ops::Mul for Matrix {
-    type Output = Self;
+impl ops::Mul<&Matrix> for &Matrix {
+    type Output = Matrix;
 
-    fn mul(self, rhs: Self) -> Self {
+    fn mul(self, rhs: &Matrix) -> Matrix {
         assert_eq!(
             self.columns, rhs.rows,
             "Cannot multiply a matrix with {} column(s) by a matrix with {} row(s)",
@@ -170,7 +201,7 @@ impl ops::Mul for Matrix {
             new_rows.push(new_cols);
         }
 
-        Self {
+        Matrix {
             rows: self.rows,
             columns: rhs.columns,
             data: new_rows,
@@ -180,7 +211,7 @@ impl ops::Mul for Matrix {
 
 // Since our Tuple implementation is essentially a 4x1 matrix, we can multiply
 // them as a matrix operation.
-impl ops::Mul<Tuple> for Matrix {
+impl ops::Mul<Tuple> for &Matrix {
     type Output = Tuple;
 
     fn mul(self, rhs: Tuple) -> Tuple {

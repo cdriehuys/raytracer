@@ -116,7 +116,20 @@ fn multiply_4x4() {
         16.0, 26.0, 46.0, 42.0,
     );
 
-    assert_eq!(a * b, want);
+    assert_eq!(&a * &b, want);
+}
+
+#[test]
+fn multiply_4x4_identity() {
+    #[rustfmt::skip]
+    let a = Matrix::square_4(
+        0.0, 1.0, 2.0, 4.0,
+        1.0, 2.0, 4.0, 8.0,
+        2.0, 4.0, 8.0, 16.0,
+        4.0, 8.0, 16.0, 32.0,
+    );
+
+    assert_eq!(&a * &Matrix::identity_4(), a);
 }
 
 #[test]
@@ -132,5 +145,41 @@ fn multiply_4x4_by_tuple() {
 
     let want = Tuple::new(18, 24, 33, 1);
 
-    assert_eq!(a * tuple, want);
+    assert_eq!(&a * tuple, want);
+}
+
+#[test]
+fn multiply_identity_4_by_tuple() {
+    let identity = Matrix::identity_4();
+    let tuple = Tuple::new(1, 2, 3, 4);
+
+    assert_eq!(&identity * tuple, tuple);
+}
+
+#[test]
+fn transpose_4x4() {
+    #[rustfmt::skip]
+    let a = Matrix::square_4(
+        0.0, 9.0, 3.0, 0.0,
+        9.0, 8.0, 0.0, 8.0,
+        1.0, 8.0, 5.0, 3.0,
+        0.0, 0.0, 5.0, 8.0,
+    );
+
+    #[rustfmt::skip]
+    let want = Matrix::square_4(
+        0.0, 9.0, 1.0, 0.0,
+        9.0, 8.0, 8.0, 0.0,
+        3.0, 0.0, 5.0, 5.0,
+        0.0, 8.0, 3.0, 8.0,
+    );
+
+    assert_eq!(a.transposed(), want);
+}
+
+#[test]
+fn transpose_identity_4() {
+    let identity = Matrix::identity_4();
+
+    assert_eq!(identity.transposed(), identity);
 }
