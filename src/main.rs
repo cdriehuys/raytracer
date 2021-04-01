@@ -1,57 +1,40 @@
-use raytracer::canvas::{renderers::render_as_ppm, Canvas};
 use raytracer::colors::Color;
 use raytracer::linear::Tuple;
-use std::fs::File;
+use raytracer::{
+    canvas::{renderers::render_as_ppm, Canvas},
+    linear::Matrix,
+};
 use std::io::BufWriter;
-
-struct Projectile {
-    position: Tuple,
-    velocity: Tuple,
-}
-
-impl Projectile {
-    fn tick(&mut self, environment: &Environment) {
-        self.position = self.position + self.velocity;
-        self.velocity = self.velocity + environment.gravity + environment.wind;
-    }
-}
-
-struct Environment {
-    gravity: Tuple,
-    wind: Tuple,
-}
+use std::{f64::consts::PI, fs::File};
 
 fn main() {
-    let mut canvas = Canvas::new(900, 500);
+    let mut canvas = Canvas::new(500, 500);
 
-    let start = Tuple::new_point(0, 1, 0);
-    let velocity = Tuple::new_vector(1.0, 1.8, 0.0).normalized() * 11.25;
+    // Transform to move from the origin (top left of canvas) to the center.
+    let center_transform = Matrix::translation(250, 250, 0);
 
-    let mut p = Projectile {
-        position: start,
-        velocity,
-    };
-    let e = Environment {
-        gravity: Tuple::new_vector(0.0, -0.1, 0.0),
-        wind: Tuple::new_vector(-0.01, 0.0, 0.0),
-    };
+    // Transform to move from the origin to the tick mark on the clock.
+    let hour_hand_transform = Matrix::translation(0, 200, 0);
 
-    let mut tick = 0;
-    while p.position.y() > 0.0 {
-        tick += 1;
-        p.tick(&e);
+    for hour in 0..12 {
+        let rotation_radians = 2.0 * PI / 12.0 * hour as f64;
+        let rotation = Matrix::rotation_z(rotation_radians);
 
-        println!(
-            "Tick {:3} - Position ({:.2}, {:.2})",
-            tick,
-            p.position.x(),
-            p.position.y()
-        );
+        // Our transform steps are:
+        // 1. Move out from the origin by the radius of the clock.
+        // 2. Rotate around the origin based on the hour.
+        // 3. Apply the offset to move from the origin to the center of the
+        //    canvas.
+        //
+        // We chain these together by multiplying them in reverse.
+        let transform = &(&center_transform * &rotation) * &hour_hand_transform;
 
-        record_position(&mut canvas, &p);
+        let point = &transform * Tuple::new_point(0, 0, 0);
+
+        record_position(&mut canvas, &point);
     }
 
-    let outfile = File::create("./plot.ppm").expect("Failed to open output file.");
+    let outfile = File::create("./clock.ppm").expect("Failed to open output file.");
     let writer = BufWriter::new(outfile);
 
     println!("Writing plot image...");
@@ -59,16 +42,11 @@ fn main() {
     println!("Finished writing plot image.");
 }
 
-fn record_position(canvas: &mut Canvas, projectile: &Projectile) {
-    let x = projectile.position.x().round() as usize;
-    let y = projectile.position.y().round() as usize;
+fn record_position(canvas: &mut Canvas, position: &Tuple) {
+    let x = position.x().round() as usize;
+    let y = position.y().round() as usize;
 
-    // Since the canvas' y-coordinates move top-down, we have to invert the
-    // projectile's y-coordinate before plotting it.
-    let y = canvas.height() - y;
-
-    // Record a 3x3 area around the projectile's position to make it easier to
-    // see.
+    // Record a 3x3 area around the position to make it easier to see.
     for x in (x - 1)..(x + 1) {
         for y in (y - 1)..(y + 1) {
             if x >= canvas.width() || y >= canvas.height() {
