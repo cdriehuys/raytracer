@@ -416,10 +416,10 @@ impl ops::Sub for Tuple {
 
 impl PartialEq for Tuple {
     fn eq(&self, other: &Self) -> bool {
-        approx_eq!(f64, self.x, other.x, ulps = 2)
-            && approx_eq!(f64, self.y, other.y, ulps = 2)
-            && approx_eq!(f64, self.z, other.z, ulps = 2)
-            && approx_eq!(f64, self.w, other.w, ulps = 2)
+        approx_eq!(f64, self.x, other.x, epsilon = 1e-5)
+            && approx_eq!(f64, self.y, other.y, epsilon = 1e-5)
+            && approx_eq!(f64, self.z, other.z, epsilon = 1e-5)
+            && approx_eq!(f64, self.w, other.w, epsilon = 1e-5)
     }
 }
 

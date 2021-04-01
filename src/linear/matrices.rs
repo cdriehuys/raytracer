@@ -117,6 +117,105 @@ impl Matrix {
         )
     }
 
+    /// Create a transformation matrix to apply a rotation around the x-axis.
+    ///
+    /// # Arguments
+    ///
+    /// * `radians` - The amount to rotate around the axis.
+    #[rustfmt::skip]
+    pub fn rotation_x(radians: f64) -> Self {
+        Self::square_4(
+            1.0, 0.0, 0.0, 0.0,
+            0.0, radians.cos(), -radians.sin(), 0.0,
+            0.0, radians.sin(), radians.cos(), 0.0,
+            0.0, 0.0, 0.0, 1.0,
+        )
+    }
+
+    /// Create a transformation matrix to apply a rotation around the y-axis.
+    ///
+    /// # Arguments
+    ///
+    /// * `radians` - The amount to rotate around the axis.
+    #[rustfmt::skip]
+    pub fn rotation_y(radians: f64) -> Self {
+        Self::square_4(
+            radians.cos(), 0.0, radians.sin(), 0.0,
+            0.0, 1.0, 0.0, 0.0,
+            -radians.sin(), 0.0, radians.cos(), 0.0,
+            0.0, 0.0, 0.0, 1.0,
+        )
+    }
+
+    /// Create a transformation matrix to apply a rotation around the z-axis.
+    ///
+    /// # Arguments
+    ///
+    /// * `radians` - The amount to rotate around the axis.
+    #[rustfmt::skip]
+    pub fn rotation_z(radians: f64) -> Self {
+        Self::square_4(
+            radians.cos(), -radians.sin(), 0.0, 0.0,
+            radians.sin(), radians.cos(), 0.0, 0.0,
+            0.0, 0.0, 1.0, 0.0,
+            0.0, 0.0, 0.0, 1.0,
+        )
+    }
+
+    /// Create a transformation matrix to apply a scaling operation.
+    ///
+    /// # Arguments
+    ///
+    /// * `x` - The factor to scale by on the x-axis.
+    /// * `y` - The factor to scale by on the y-axis.
+    /// * `z` - The factor to scale by on the z-axis.
+    #[rustfmt::skip]
+    pub fn scaling<X: Into<f64>, Y: Into<f64>, Z: Into<f64>>(x: X, y: Y, z: Z) -> Self {
+        Self::square_4(
+            x.into(), 0.0, 0.0, 0.0,
+            0.0, y.into(), 0.0, 0.0,
+            0.0, 0.0, z.into(), 0.0,
+            0.0, 0.0, 0.0, 1.0,
+        )
+    }
+
+    /// Create a transformation matrix to apply a shearing operation.
+    ///
+    /// # Arguments
+    ///
+    /// * `xy` - The amount to scale x in proportion to y.
+    /// * `xz` - The amount to scale x in proportion to z.
+    /// * `yx` - The amount to scale y in proportion to x.
+    /// * `yz` - The amount to scale y in proportion to z.
+    /// * `zx` - The amount to scale z in proportion to x.
+    /// * `zy` - The amount to scale z in proportion to y.
+    #[rustfmt::skip]
+    pub fn shearing(xy: f64, xz: f64, yx: f64, yz: f64, zx: f64, zy: f64) -> Self {
+        Self::square_4(
+            1.0, xy, xz, 0.0,
+            yx, 1.0, yz, 0.0,
+            zx, zy, 1.0, 0.0,
+            0.0, 0.0, 0.0, 1.0,
+        )
+    }
+
+    /// Create a translation matrix.
+    ///
+    /// # Arguments
+    ///
+    /// * `x` - The x-offset of the translation.
+    /// * `y` - The y-offset of the translation.
+    /// * `z` - The z-offset of the translation.
+    #[rustfmt::skip]
+    pub fn translation<X: Into<f64>, Y: Into<f64>, Z: Into<f64>>(x: X, y: Y, z: Z) -> Self {
+        Self::square_4(
+            1.0, 0.0, 0.0, x.into(),
+            0.0, 1.0, 0.0, y.into(),
+            0.0, 0.0, 1.0, z.into(),
+            0.0, 0.0, 0.0, 1.0,
+        )
+    }
+
     /// Compute the cofactor of a matrix element.
     ///
     /// The cofactor is essentially the minor of an element with a possible
