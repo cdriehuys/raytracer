@@ -1,5 +1,5 @@
 use float_cmp::approx_eq;
-use raytracer::Tuple;
+use raytracer::linear::Tuple;
 
 #[test]
 fn cross_product_vectors() {

@@ -2,7 +2,7 @@ use std::{fmt::Debug, ops};
 
 use float_cmp::approx_eq;
 
-use crate::Tuple;
+use super::Tuple;
 
 /// An algebraic matrix that can store floating point numbers.
 #[derive(Debug)]

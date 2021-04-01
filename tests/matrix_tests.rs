@@ -1,6 +1,5 @@
 use float_cmp::approx_eq;
-use raytracer::linear::Matrix;
-use raytracer::Tuple;
+use raytracer::linear::{Matrix, Tuple};
 
 #[test]
 fn create_2x2() {

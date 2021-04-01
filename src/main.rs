@@ -1,6 +1,6 @@
 use raytracer::canvas::{renderers::render_as_ppm, Canvas};
 use raytracer::colors::Color;
-use raytracer::Tuple;
+use raytracer::linear::Tuple;
 use std::fs::File;
 use std::io::BufWriter;
 
