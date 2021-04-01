@@ -148,6 +148,42 @@ impl Matrix {
         determinant
     }
 
+    /// Find the inverse of the matrix.
+    ///
+    /// The inverse is only computable if the matrix is invertible, which means
+    /// it has a non-zero determinant.
+    pub fn inverted(&self) -> Self {
+        let determinant = self.determinant();
+
+        // Don't use the is_invertible function so we can avoid computing the
+        // determinant twice.
+        assert!(determinant != 0.0, "Cannot invert non-invertible matrix.");
+
+        let mut new_rows = Vec::with_capacity(self.columns);
+        for col in 0..self.rows {
+            let mut new_columns = Vec::with_capacity(self.rows);
+
+            for row in 0..self.columns {
+                let c = self.cofactor(row, col);
+
+                new_columns.push(c / determinant);
+            }
+
+            new_rows.push(new_columns);
+        }
+
+        Self {
+            rows: self.columns,
+            columns: self.rows,
+            data: new_rows,
+        }
+    }
+
+    /// Determine if the matrix is invertible.
+    pub fn is_invertible(&self) -> bool {
+        self.determinant() != 0.0
+    }
+
     /// Compute the minor of a matrix element.
     ///
     /// The minor is computed by finding the determinant of the submatrix where
@@ -225,7 +261,10 @@ impl PartialEq for Matrix {
 
         for row in 0..self.rows {
             for col in 0..self.columns {
-                if !approx_eq!(f64, self[row][col], rhs[row][col]) {
+                // We use a more imprecise epsilon value here because it makes
+                // it easier to test when we only need to specify 5 decimals of
+                // precision.
+                if !approx_eq!(f64, self[row][col], rhs[row][col], epsilon = 1e-5) {
                     return false;
                 }
             }
