@@ -50,6 +50,16 @@ impl WorldObject for Sphere {
         Intersections::new(vec![i1, i2])
     }
 
+    fn normal_at(&self, point: &Tuple) -> Tuple {
+        let object_point = &self.transform.inverted() * *point;
+        let object_normal = object_point - Tuple::new_point(0, 0, 0);
+
+        let world_normal = &self.transform.inverted().transposed() * object_normal;
+        let world_normal = Tuple::new(world_normal.x(), world_normal.y(), world_normal.z(), 0.0);
+
+        world_normal.normalized()
+    }
+
     fn transform(&self) -> &Matrix {
         &self.transform
     }

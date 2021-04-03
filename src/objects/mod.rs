@@ -5,7 +5,7 @@ use std::{any::Any, fmt::Debug};
 pub use sphere::Sphere;
 
 use crate::intersections::Intersections;
-use crate::linear::Matrix;
+use crate::linear::{Matrix, Tuple};
 use crate::rays::Ray;
 
 pub trait WorldObject: Debug {
@@ -14,6 +14,9 @@ pub trait WorldObject: Debug {
 
     /// Determine if and where a ray intersects the object.
     fn intersect(&self, ray: &Ray) -> Intersections;
+
+    /// Compute the normal vector at a specific point on the object's surface.
+    fn normal_at(&self, point: &Tuple) -> Tuple;
 
     /// Retrieve the object's transformation matrix.
     fn transform(&self) -> &Matrix;
