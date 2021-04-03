@@ -11,15 +11,19 @@ At the end of each chapter, the new capabilities of the ray tracer are utilized
 in the main program. It can be executed with:
 
 ```bash
-cargo run
+# Using the release profile instead of the default debug profile has a massive
+# effect on performance.
+cargo run --release
 ```
 
-### Current Behavior (Ch. 4)
+### Current Behavior (Ch. 5)
 
-The raytracer currently creates the hour marks on a clock face to utilize the
-new transformation matrices. The output looks like:
+Running the application produces the silhouette of a sphere. The sphere is a
+unit-sphere located at the origin. Rays are cast from a point in space towards a
+"wall" behind the sphere. Locations on the wall are colored red if the ray hits
+the sphere. This produces an image like:
 
-![raytracer clock](https://user-images.githubusercontent.com/4708504/113330377-80b48100-92d3-11eb-9b9e-b1d1498bd6c4.png)
+![Ray traced sphere](https://user-images.githubusercontent.com/4708504/113485288-99eb3800-9461-11eb-87ba-c232ccf0587b.png)
 
 ### History
 
@@ -37,6 +41,15 @@ to compute the trajectory of a projectile and used the new canvas to plot the
 projectile's position over time.
 
 ![projectile motion plot](https://user-images.githubusercontent.com/4708504/112875950-b6f6c400-9079-11eb-9832-253ac0f83d82.png)
+
+#### Matrix Transforms (Ch. 4)
+
+The next major addition was matrix transformations which allows us to use a
+consistent operation (matrix multiplication) to perform arbitrary transforms of
+objects. For example, the hour markers on a clock can be drawn by applying
+rotations to a single hour marker as shown in the image:
+
+![raytracer clock](https://user-images.githubusercontent.com/4708504/113330377-80b48100-92d3-11eb-9b9e-b1d1498bd6c4.png)
 
 </details>
 

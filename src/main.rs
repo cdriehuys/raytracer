@@ -1,59 +1,47 @@
+use raytracer::canvas::{renderers::render_as_ppm, Canvas};
 use raytracer::colors::Color;
 use raytracer::linear::Tuple;
-use raytracer::{
-    canvas::{renderers::render_as_ppm, Canvas},
-    linear::Matrix,
-};
+use raytracer::objects::{Sphere, WorldObject};
+use raytracer::rays::Ray;
+use std::fs::File;
 use std::io::BufWriter;
-use std::{f64::consts::PI, fs::File};
 
 fn main() {
     let mut canvas = Canvas::new(500, 500);
 
-    // Transform to move from the origin (top left of canvas) to the center.
-    let center_transform = Matrix::translation(250, 250, 0);
+    let light_position = Tuple::new_point(0, 0, -5);
+    let canvas_z = 10.0;
 
-    // Transform to move from the origin to the tick mark on the clock.
-    let hour_hand_transform = Matrix::translation(0, 200, 0);
+    let pixel_size = 15.0 / canvas.height() as f64;
 
-    for hour in 0..12 {
-        let rotation_radians = 2.0 * PI / 12.0 * hour as f64;
-        let rotation = Matrix::rotation_z(rotation_radians);
+    let sphere = Sphere::default();
 
-        // Our transform steps are:
-        // 1. Move out from the origin by the radius of the clock.
-        // 2. Rotate around the origin based on the hour.
-        // 3. Apply the offset to move from the origin to the center of the
-        //    canvas.
-        //
-        // We chain these together by multiplying them in reverse.
-        let transform = &(&center_transform * &rotation) * &hour_hand_transform;
+    for y in 0..canvas.height() {
+        for x in 0..canvas.width() {
+            let world_x = (x as f64 - (canvas.width() as f64 / 2.0)) * pixel_size;
+            let world_y = (y as f64 - (canvas.height() as f64 / 2.0)) * pixel_size;
 
-        let point = &transform * Tuple::new_point(0, 0, 0);
+            let pixel_location = Tuple::new_point(world_x, world_y, canvas_z);
+            let ray = Ray::new(
+                light_position,
+                (pixel_location - light_position).normalized(),
+            );
 
-        record_position(&mut canvas, &point);
+            let color = match sphere.intersect(&ray).hit() {
+                Some(_) => Color::new(1, 0, 0),
+                None => Color::new(0, 0, 0),
+            };
+
+            canvas.write_pixel(x, y, color);
+        }
+
+        println!("Finished row: {:3}", y);
     }
 
-    let outfile = File::create("./clock.ppm").expect("Failed to open output file.");
+    let outfile = File::create("./sphere.ppm").expect("Failed to open output file.");
     let writer = BufWriter::new(outfile);
 
     println!("Writing plot image...");
     render_as_ppm(&canvas, writer).expect("Failed to render as PPM.");
     println!("Finished writing plot image.");
-}
-
-fn record_position(canvas: &mut Canvas, position: &Tuple) {
-    let x = position.x().round() as usize;
-    let y = position.y().round() as usize;
-
-    // Record a 3x3 area around the position to make it easier to see.
-    for x in (x - 1)..(x + 1) {
-        for y in (y - 1)..(y + 1) {
-            if x >= canvas.width() || y >= canvas.height() {
-                continue;
-            }
-
-            canvas.write_pixel(x, y, Color::new(1, 0, 0));
-        }
-    }
 }
