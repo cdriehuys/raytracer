@@ -5,7 +5,7 @@ use float_cmp::approx_eq;
 use super::Tuple;
 
 /// An algebraic matrix that can store floating point numbers.
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Matrix {
     rows: usize,
     columns: usize,

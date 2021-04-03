@@ -25,7 +25,7 @@ impl Intersection {
     /// # use raytracer::objects::Sphere;
     /// let sphere = Sphere::default();
     ///
-    /// let intersection = Intersection::new(3.5, Box::new(sphere));
+    /// let intersection = Intersection::new(3.5, Box::new(sphere.clone()));
     ///
     /// assert_eq!(intersection.t(), 3.5);
     ///
@@ -77,8 +77,8 @@ impl Intersections {
     /// # use raytracer::intersections::{Intersection, Intersections};
     /// # use raytracer::objects::Sphere;
     /// let sphere = Sphere::default();
-    /// let i1 = Intersection::new(1.0, Box::new(sphere));
-    /// let i2 = Intersection::new(2.0, Box::new(sphere));
+    /// let i1 = Intersection::new(1.0, Box::new(sphere.clone()));
+    /// let i2 = Intersection::new(2.0, Box::new(sphere.clone()));
     ///
     /// let intersections = Intersections::new(vec![i1, i2]);
     ///

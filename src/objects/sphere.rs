@@ -1,13 +1,15 @@
 use std::any::Any;
 
 use crate::intersections::{Intersection, Intersections};
-use crate::linear::Tuple;
+use crate::linear::{Matrix, Tuple};
 use crate::rays::Ray;
 
 use super::WorldObject;
 
-#[derive(Clone, Copy, Debug, Default)]
-pub struct Sphere {}
+#[derive(Clone, Debug)]
+pub struct Sphere {
+    transform: Matrix,
+}
 
 impl WorldObject for Sphere {
     fn as_any(&self) -> &dyn Any {
@@ -21,10 +23,14 @@ impl WorldObject for Sphere {
     ///
     /// * `ray` - The ray to determine intersections for.
     fn intersect(&self, ray: &Ray) -> Intersections {
-        let sphere_to_ray = ray.origin() - Tuple::new_point(0, 0, 0);
+        // Create an object-space (as opposed to world-space) copy of the ray so
+        // that the sphere's transform impacts the operation.
+        let object_ray = ray.transformed(&self.transform.inverted());
 
-        let a = ray.direction().dot(ray.direction());
-        let b = 2.0 * ray.direction().dot(sphere_to_ray);
+        let sphere_to_ray = object_ray.origin() - Tuple::new_point(0, 0, 0);
+
+        let a = object_ray.direction().dot(object_ray.direction());
+        let b = 2.0 * object_ray.direction().dot(sphere_to_ray);
         let c = sphere_to_ray.dot(sphere_to_ray) - 1.0;
 
         let discriminant = (b * b) - 4.0 * a * c;
@@ -38,10 +44,44 @@ impl WorldObject for Sphere {
         let t1 = (-b - discriminant.sqrt()) / (2.0 * a);
         let t2 = (-b + discriminant.sqrt()) / (2.0 * a);
 
-        let i1 = Intersection::new(t1, Box::new(*self));
-        let i2 = Intersection::new(t2, Box::new(*self));
+        let i1 = Intersection::new(t1, Box::new(self.clone()));
+        let i2 = Intersection::new(t2, Box::new(self.clone()));
 
         Intersections::new(vec![i1, i2])
+    }
+
+    fn transform(&self) -> &Matrix {
+        &self.transform
+    }
+
+    /// Apply a new transformation matrix to the sphere.
+    ///
+    /// # Arguments
+    ///
+    /// * `transform` - The sphere's new transformation matrix.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use raytracer::linear::Matrix;
+    /// # use raytracer::objects::{Sphere, WorldObject};
+    /// let mut s = Sphere::default();
+    /// let t = Matrix::translation(2, 3, 4);
+    ///
+    /// s.set_transform(t.clone());
+    ///
+    /// assert_eq!(*s.transform(), t);
+    /// ```
+    fn set_transform(&mut self, transform: Matrix) {
+        self.transform = transform;
+    }
+}
+
+impl Default for Sphere {
+    fn default() -> Self {
+        Self {
+            transform: Matrix::identity_4(),
+        }
     }
 }
 

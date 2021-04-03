@@ -1,4 +1,4 @@
-use crate::linear::Tuple;
+use crate::linear::{Matrix, Tuple};
 
 /// A ray represents a ray of light travelling through a scene. It has a
 /// starting location as well as a direction. Casting a ray through a scene and
@@ -65,5 +65,41 @@ impl Ray {
     /// ```
     pub fn position_at(&self, t: f64) -> Tuple {
         self.origin + self.direction * t
+    }
+
+    /// Apply a transformation to a ray.
+    ///
+    /// # Arguments
+    ///
+    /// * `transform` - The transformation to apply.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use raytracer::linear::{Matrix, Tuple};
+    /// # use raytracer::rays::Ray;
+    /// let origin = Tuple::new_point(1, 2, 3);
+    /// let direction = Tuple::new_vector(0, 1, 0);
+    /// let ray = Ray::new(origin, direction);
+    ///
+    /// // Translation only affects the origin.
+    /// let transform = Matrix::translation(3, 4, 5);
+    /// let r2 = ray.transformed(&transform);
+    ///
+    /// assert_eq!(r2.origin(), Tuple::new_point(4, 6, 8));
+    /// assert_eq!(r2.direction(), direction);
+    ///
+    /// // Scaling affects the origin and direction.
+    /// let transform = Matrix::scaling(2, 3, 4);
+    /// let r3 = ray.transformed(&transform);
+    ///
+    /// assert_eq!(r3.origin(), Tuple::new_point(2, 6, 12));
+    /// assert_eq!(r3.direction(), Tuple::new_vector(0, 3, 0));
+    /// ```
+    pub fn transformed(&self, transform: &Matrix) -> Self {
+        Self {
+            origin: transform * self.origin,
+            direction: transform * self.direction,
+        }
     }
 }
