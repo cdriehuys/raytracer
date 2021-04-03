@@ -1,6 +1,6 @@
 use raytracer::linear::Tuple;
+use raytracer::objects::{Sphere, WorldObject};
 use raytracer::rays::Ray;
-use raytracer::sphere::Sphere;
 
 #[test]
 fn intersect_two_points() {
@@ -10,8 +10,8 @@ fn intersect_two_points() {
     let intersections = sphere.intersect(&ray);
 
     assert_eq!(intersections.len(), 2);
-    assert_eq!(intersections[0], 4.0);
-    assert_eq!(intersections[1], 6.0);
+    assert_eq!(intersections[0].t(), 4.0);
+    assert_eq!(intersections[1].t(), 6.0);
 }
 
 #[test]
@@ -22,8 +22,8 @@ fn intersect_tangent() {
     let intersections = sphere.intersect(&ray);
 
     assert_eq!(intersections.len(), 2);
-    assert_eq!(intersections[0], 5.0);
-    assert_eq!(intersections[1], 5.0);
+    assert_eq!(intersections[0].t(), 5.0);
+    assert_eq!(intersections[1].t(), 5.0);
 }
 
 #[test]
@@ -44,8 +44,8 @@ fn intersect_origin_inside_sphere() {
     let intersections = sphere.intersect(&ray);
 
     assert_eq!(intersections.len(), 2);
-    assert_eq!(intersections[0], -1.0);
-    assert_eq!(intersections[1], 1.0);
+    assert_eq!(intersections[0].t(), -1.0);
+    assert_eq!(intersections[1].t(), 1.0);
 }
 
 #[test]
@@ -56,6 +56,6 @@ fn intersect_ray_in_front_of_sphere() {
     let intersections = sphere.intersect(&ray);
 
     assert_eq!(intersections.len(), 2);
-    assert_eq!(intersections[0], -6.0);
-    assert_eq!(intersections[1], -4.0);
+    assert_eq!(intersections[0].t(), -6.0);
+    assert_eq!(intersections[1].t(), -4.0);
 }
