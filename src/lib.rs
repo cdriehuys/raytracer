@@ -1,6 +1,10 @@
 pub mod canvas;
-pub mod colors;
 pub mod intersections;
 pub mod linear;
 pub mod objects;
-pub mod rays;
+
+mod colors;
+mod rays;
+
+pub use colors::Color;
+pub use rays::Ray;

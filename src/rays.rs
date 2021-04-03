@@ -22,7 +22,7 @@ impl Ray {
     ///
     /// ```
     /// # use raytracer::linear::Tuple;
-    /// # use raytracer::rays::Ray;
+    /// # use raytracer::Ray;
     /// let origin = Tuple::new_point(1, 2, 3);
     /// let direction = Tuple::new_vector(4, 5, 6);
     ///
@@ -55,7 +55,7 @@ impl Ray {
     ///
     /// ```
     /// # use raytracer::linear::Tuple;
-    /// # use raytracer::rays::Ray;
+    /// # use raytracer::Ray;
     /// let ray = Ray::new(Tuple::new_point(2, 3, 4), Tuple::new_vector(1, 0, 0));
     ///
     /// assert_eq!(ray.position_at(0.0), Tuple::new_point(2, 3, 4));
@@ -77,7 +77,7 @@ impl Ray {
     ///
     /// ```
     /// # use raytracer::linear::{Matrix, Tuple};
-    /// # use raytracer::rays::Ray;
+    /// # use raytracer::Ray;
     /// let origin = Tuple::new_point(1, 2, 3);
     /// let direction = Tuple::new_vector(0, 1, 0);
     /// let ray = Ray::new(origin, direction);

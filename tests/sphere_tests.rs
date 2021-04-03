@@ -1,6 +1,6 @@
 use raytracer::linear::{Matrix, Tuple};
 use raytracer::objects::{Sphere, WorldObject};
-use raytracer::rays::Ray;
+use raytracer::Ray;
 
 #[test]
 fn default_transform() {

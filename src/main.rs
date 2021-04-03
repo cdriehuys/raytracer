@@ -1,8 +1,7 @@
 use raytracer::canvas::{renderers::render_as_ppm, Canvas};
-use raytracer::colors::Color;
 use raytracer::linear::Tuple;
 use raytracer::objects::{Sphere, WorldObject};
-use raytracer::rays::Ray;
+use raytracer::{Color, Ray};
 use std::fs::File;
 use std::io::BufWriter;
 

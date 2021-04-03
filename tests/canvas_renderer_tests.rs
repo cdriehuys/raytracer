@@ -1,5 +1,5 @@
 use raytracer::canvas::{renderers::render_as_ppm, Canvas};
-use raytracer::colors::Color;
+use raytracer::Color;
 
 #[test]
 fn ppm_header() {
