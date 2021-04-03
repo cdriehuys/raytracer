@@ -1,6 +1,9 @@
+use float_cmp::approx_eq;
+
 use crate::objects::WorldObject;
 use std::{fmt::Debug, ops};
 
+/// A representation of a ray's intersection with a world object.
 #[derive(Debug)]
 pub struct Intersection {
     t: f64,
@@ -47,6 +50,13 @@ impl Intersection {
     }
 }
 
+impl PartialEq for Intersection {
+    fn eq(&self, other: &Intersection) -> bool {
+        approx_eq!(f64, self.t, other.t) && &*self.object == &*other.object
+    }
+}
+
+/// A collection of intersections.
 #[derive(Debug, Default)]
 pub struct Intersections {
     intersections: Vec<Intersection>,
@@ -54,6 +64,8 @@ pub struct Intersections {
 
 impl Intersections {
     /// Create a new collection of intersections.
+    ///
+    /// The provided intersections will be sorted by their `t` value.
     ///
     /// # Arguments
     ///
@@ -74,10 +86,20 @@ impl Intersections {
     /// assert_eq!(intersections[0].t(), 1.0);
     /// assert_eq!(intersections[1].t(), 2.0);
     /// ```
-    pub fn new(intersections: Vec<Intersection>) -> Self {
+    pub fn new(mut intersections: Vec<Intersection>) -> Self {
+        intersections.sort_by(|a, b| a.t.partial_cmp(&b.t).unwrap());
+
         Self { intersections }
     }
 
+    /// Determine which intersection from the collection is the first to be hit.
+    ///
+    /// This is always the intersection with the lowest non-negative `t` value.
+    pub fn hit(&self) -> Option<&Intersection> {
+        self.intersections.iter().find(|i| i.t >= 0.0)
+    }
+
+    /// Find the number of elements in the intersection collection.
     pub fn len(&self) -> usize {
         self.intersections.len()
     }
