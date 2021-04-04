@@ -7,7 +7,9 @@ pub mod objects;
 mod colors;
 mod materials;
 mod rays;
+mod world;
 
 pub use colors::Color;
 pub use materials::Material;
 pub use rays::Ray;
+pub use world::World;

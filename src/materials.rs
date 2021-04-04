@@ -30,8 +30,16 @@ impl Material {
         self.diffuse
     }
 
+    pub fn with_diffuse(&self, diffuse: f64) -> Self {
+        Self { diffuse, ..*self }
+    }
+
     pub fn specular(&self) -> f64 {
         self.specular
+    }
+
+    pub fn with_specular(&self, specular: f64) -> Self {
+        Self { specular, ..*self }
     }
 
     pub fn shininess(&self) -> f64 {

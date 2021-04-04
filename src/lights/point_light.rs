@@ -1,6 +1,7 @@
 use crate::{linear::Tuple, Color};
 
 /// A point light emits a specific intensity from a single point in space.
+#[derive(Clone, Copy, Debug)]
 pub struct PointLight {
     position: Tuple,
     intensity: Color,
@@ -41,5 +42,11 @@ impl PointLight {
 
     pub fn position(&self) -> Tuple {
         self.position
+    }
+}
+
+impl PartialEq for PointLight {
+    fn eq(&self, other: &Self) -> bool {
+        self.position == other.position && self.intensity == other.intensity
     }
 }

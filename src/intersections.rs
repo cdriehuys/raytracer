@@ -92,6 +92,25 @@ impl Intersections {
         Self { intersections }
     }
 
+    /// Add a group of intersections to the collection.
+    ///
+    /// The collection's order is maintained.
+    ///
+    /// # Arguments
+    ///
+    /// * `intersections` - The intersections to add to the collection.
+    pub fn add_intersections(&mut self, intersections: Intersections) {
+        for intersection in intersections.intersections.into_iter() {
+            match self
+                .intersections
+                .binary_search_by(|a| a.t.partial_cmp(&intersection.t).unwrap())
+            {
+                Ok(_) => (),
+                Err(pos) => self.intersections.insert(pos, intersection),
+            }
+        }
+    }
+
     /// Determine which intersection from the collection is the first to be hit.
     ///
     /// This is always the intersection with the lowest non-negative `t` value.

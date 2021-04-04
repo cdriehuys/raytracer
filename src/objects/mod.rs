@@ -28,7 +28,7 @@ pub trait WorldObject: Debug {
     fn set_transform(&mut self, transform: Matrix);
 }
 
-impl PartialEq for &dyn WorldObject {
+impl PartialEq for dyn WorldObject {
     fn eq(&self, other: &Self) -> bool {
         self.transform() == other.transform()
     }
