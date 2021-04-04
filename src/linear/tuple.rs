@@ -236,6 +236,10 @@ impl Tuple {
             w: self.w / magnitude,
         }
     }
+
+    pub fn reflected_over(&self, normal: &Tuple) -> Self {
+        *self - *normal * 2 * self.dot(*normal)
+    }
 }
 
 impl ops::Add for Tuple {

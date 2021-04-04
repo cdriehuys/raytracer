@@ -42,9 +42,9 @@ impl Color {
 
 impl PartialEq for Color {
     fn eq(&self, rhs: &Self) -> bool {
-        float_cmp::approx_eq!(f64, self.r, rhs.r)
-            && float_cmp::approx_eq!(f64, self.g, rhs.g)
-            && float_cmp::approx_eq!(f64, self.b, rhs.b)
+        float_cmp::approx_eq!(f64, self.r, rhs.r, epsilon = 1e-5)
+            && float_cmp::approx_eq!(f64, self.g, rhs.g, epsilon = 1e-5)
+            && float_cmp::approx_eq!(f64, self.b, rhs.b, epsilon = 1e-5)
     }
 }
 

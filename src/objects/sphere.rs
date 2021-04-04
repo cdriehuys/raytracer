@@ -2,12 +2,13 @@ use std::any::Any;
 
 use crate::intersections::{Intersection, Intersections};
 use crate::linear::{Matrix, Tuple};
-use crate::rays::Ray;
+use crate::{Material, Ray};
 
 use super::WorldObject;
 
 #[derive(Clone, Debug)]
 pub struct Sphere {
+    material: Material,
     transform: Matrix,
 }
 
@@ -50,6 +51,10 @@ impl WorldObject for Sphere {
         Intersections::new(vec![i1, i2])
     }
 
+    fn material(&self) -> &Material {
+        &self.material
+    }
+
     fn normal_at(&self, point: &Tuple) -> Tuple {
         let object_point = &self.transform.inverted() * *point;
         let object_normal = object_point - Tuple::new_point(0, 0, 0);
@@ -90,6 +95,7 @@ impl WorldObject for Sphere {
 impl Default for Sphere {
     fn default() -> Self {
         Self {
+            material: Material::default(),
             transform: Matrix::identity_4(),
         }
     }

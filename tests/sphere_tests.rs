@@ -2,7 +2,14 @@ use std::f64::consts::PI;
 
 use raytracer::linear::{Matrix, Tuple};
 use raytracer::objects::{Sphere, WorldObject};
-use raytracer::Ray;
+use raytracer::{Material, Ray};
+
+#[test]
+fn default_material() {
+    let sphere = Sphere::default();
+
+    assert_eq!(*sphere.material(), Material::default());
+}
 
 #[test]
 fn default_transform() {

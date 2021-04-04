@@ -54,3 +54,24 @@ fn magnitude_negative_components() {
 
     assert!(approx_eq!(f64, vector.magnitude(), want));
 }
+
+#[test]
+fn reflected_over_45deg_approach() {
+    let v = Tuple::new_vector(1, -1, 0);
+    let n = Tuple::new_vector(0, 1, 0);
+
+    let r = v.reflected_over(&n);
+
+    assert_eq!(r, Tuple::new_vector(1, 1, 0));
+}
+
+#[test]
+fn reflected_over_slanted_surface() {
+    let v = Tuple::new_vector(0, -1, 0);
+    let sqrt_2_over_2 = (2.0 as f64).sqrt() / 2.0;
+    let n = Tuple::new_vector(sqrt_2_over_2, sqrt_2_over_2, 0.0);
+
+    let r = v.reflected_over(&n);
+
+    assert_eq!(r, Tuple::new_vector(1, 0, 0));
+}

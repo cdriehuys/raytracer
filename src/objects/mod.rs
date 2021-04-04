@@ -6,7 +6,7 @@ pub use sphere::Sphere;
 
 use crate::intersections::Intersections;
 use crate::linear::{Matrix, Tuple};
-use crate::rays::Ray;
+use crate::{Material, Ray};
 
 pub trait WorldObject: Debug {
     /// Allow for downcasting to obtain the original concrete struct.
@@ -14,6 +14,9 @@ pub trait WorldObject: Debug {
 
     /// Determine if and where a ray intersects the object.
     fn intersect(&self, ray: &Ray) -> Intersections;
+
+    /// Get the object's material.
+    fn material(&self) -> &Material;
 
     /// Compute the normal vector at a specific point on the object's surface.
     fn normal_at(&self, point: &Tuple) -> Tuple;
