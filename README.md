@@ -16,14 +16,14 @@ in the main program. It can be executed with:
 cargo run --release
 ```
 
-### Current Behavior (Ch. 5)
+### Current Behavior (Ch. 6)
 
-Running the application produces the silhouette of a sphere. The sphere is a
-unit-sphere located at the origin. Rays are cast from a point in space towards a
-"wall" behind the sphere. Locations on the wall are colored red if the ray hits
-the sphere. This produces an image like:
+Running the application produces a rendering of a sphere utilizing a material
+and light source. The material utilizes ambient, sdiffuse, and specular
+reflections to produce a specific color at each position on the sphere. The
+result is something like:
 
-![Ray traced sphere](https://user-images.githubusercontent.com/4708504/113485288-99eb3800-9461-11eb-87ba-c232ccf0587b.png)
+![Ray traced sphere](https://user-images.githubusercontent.com/4708504/113493009-aaff6d80-9490-11eb-9430-f4386fff04ea.png)
 
 ### History
 
@@ -50,6 +50,15 @@ objects. For example, the hour markers on a clock can be drawn by applying
 rotations to a single hour marker as shown in the image:
 
 ![raytracer clock](https://user-images.githubusercontent.com/4708504/113330377-80b48100-92d3-11eb-9b9e-b1d1498bd6c4.png)
+
+#### Casting Rays (Ch. 5)
+
+The next step was actually casting rays to produce the silhouette of a sphere.
+The sphere is a unit-sphere located at the origin. Rays are cast from a point in
+space towards a "wall" behind the sphere. Locations on the wall are colored red
+if the ray hits the sphere. This produces an image like:
+
+![Ray traced sphere silhouette](https://user-images.githubusercontent.com/4708504/113485288-99eb3800-9461-11eb-87ba-c232ccf0587b.png)
 
 </details>
 

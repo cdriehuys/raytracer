@@ -12,6 +12,15 @@ pub struct Sphere {
     transform: Matrix,
 }
 
+impl Sphere {
+    pub fn with_material(&self, material: Material) -> Self {
+        Self {
+            material,
+            transform: self.transform.clone(),
+        }
+    }
+}
+
 impl WorldObject for Sphere {
     fn as_any(&self) -> &dyn Any {
         self
