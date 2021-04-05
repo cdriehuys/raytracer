@@ -42,10 +42,7 @@ impl<'a> World<'a> {
     /// let world = World::new();
     ///
     /// assert_eq!(world.objects.len(), 0);
-    ///
-    /// if let Some(light) = world.light {
-    ///     panic!("Unexpected light source: {:?}", light);
-    /// }
+    /// assert!(world.light.is_none());
     /// ```
     pub fn new() -> Self {
         Self {
