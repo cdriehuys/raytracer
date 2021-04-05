@@ -1,58 +1,86 @@
-use raytracer::canvas::{renderers::render_as_ppm, Canvas};
-use raytracer::lights::PointLight;
-use raytracer::linear::Tuple;
-use raytracer::objects::{Sphere, WorldObject};
-use raytracer::{Color, Material, Ray};
-use std::fs::File;
-use std::io::BufWriter;
+use std::{
+    f64::consts::{FRAC_PI_2, FRAC_PI_3, FRAC_PI_4},
+    fs::File,
+    io::BufWriter,
+};
+
+use raytracer::{
+    camera::{view_transform, Camera},
+    canvas::renderers::render_as_ppm,
+    linear::{Matrix, Tuple},
+    objects::{Sphere, WorldObject},
+    Color, Material, World,
+};
 
 fn main() {
-    let mut canvas = Canvas::new(500, 500);
-    let eye_position = Tuple::new_point(0, 0, -5);
-    let canvas_z = 10.0;
+    let floor = Sphere::default()
+        .with_transform(Matrix::scaling(10, 0.01, 10))
+        .with_material(
+            Material::default()
+                .with_color(Color::new(1, 0.9, 0.9))
+                .with_specular(0.0),
+        );
 
-    let pixel_size = 7.0 / canvas.height() as f64;
+    let left_wall = Sphere::default()
+        .with_transform(
+            &(&(&Matrix::translation(0, 0, 5) * &Matrix::rotation_y(-FRAC_PI_4))
+                * &Matrix::rotation_x(FRAC_PI_2))
+                * &Matrix::scaling(10, 0.01, 10),
+        )
+        .with_material(floor.material().clone());
 
-    let sphere =
-        Sphere::default().with_material(Material::default().with_color(Color::new(1, 0.2, 1)));
+    let right_wall = Sphere::default()
+        .with_transform(
+            &(&(&Matrix::translation(0, 0, 5) * &Matrix::rotation_y(FRAC_PI_4))
+                * &Matrix::rotation_x(FRAC_PI_2))
+                * &Matrix::scaling(10, 0.01, 10),
+        )
+        .with_material(floor.material().clone());
 
-    let light = PointLight::new(Tuple::new_point(-10, 10, -10), Color::new(1, 1, 1));
+    let middle = Sphere::default()
+        .with_transform(Matrix::translation(-0.5, 1, 0.5))
+        .with_material(
+            Material::default()
+                .with_color(Color::new(0.1, 1, 0.5))
+                .with_diffuse(0.7)
+                .with_specular(0.3),
+        );
 
-    for y in 0..canvas.height() {
-        for x in 0..canvas.width() {
-            let world_x = (x as f64 - (canvas.width() as f64 / 2.0)) * pixel_size;
-            let world_y = (y as f64 - (canvas.height() as f64 / 2.0)) * pixel_size;
+    let right = Sphere::default()
+        .with_transform(&Matrix::translation(1.5, 0.5, -0.5) * &Matrix::scaling(0.5, 0.5, 0.5))
+        .with_material(
+            Material::default()
+                .with_color(Color::new(0.5, 1, 0.1))
+                .with_diffuse(0.7)
+                .with_specular(0.3),
+        );
 
-            let pixel_location = Tuple::new_point(world_x, world_y, canvas_z);
-            let ray = Ray::new(eye_position, (pixel_location - eye_position).normalized());
+    let left = Sphere::default()
+        .with_transform(
+            &Matrix::translation(-1.5, 0.33, -0.75) * &Matrix::scaling(0.33, 0.33, 0.33),
+        )
+        .with_material(
+            Material::default()
+                .with_color(Color::new(1, 0.8, 0.1))
+                .with_diffuse(0.7)
+                .with_specular(0.3),
+        );
 
-            let color = match sphere.intersect(&ray).hit() {
-                Some(hit) => {
-                    let position = ray.position_at(hit.t());
-                    let normal = sphere.normal_at(&position);
-                    let eye = -ray.direction();
+    let mut world = World::default();
+    world.objects = vec![&floor, &left_wall, &right_wall, &middle, &left, &right];
 
-                    sphere.material().light(&light, &position, &eye, &normal)
-                }
-                None => Color::new(0, 0, 0),
-            };
+    let camera = Camera::new(1000, 500, FRAC_PI_3).with_transform(view_transform(
+        &Tuple::new_point(0.0, 1.5, -5.0),
+        &Tuple::new_point(0, 1, 0),
+        &Tuple::new_vector(0, 1, 0),
+    ));
 
-            set_world_pixel(&mut canvas, x, y, &color);
-        }
+    let canvas = camera.render(&world);
 
-        println!("Finished row: {:3}", y);
-    }
-
-    let outfile = File::create("./sphere.ppm").expect("Failed to open output file.");
+    let outfile = File::create("./scene.ppm").expect("Failed to open output file.");
     let writer = BufWriter::new(outfile);
 
     println!("Writing plot image...");
     render_as_ppm(&canvas, writer).expect("Failed to render as PPM.");
     println!("Finished writing plot image.");
-}
-
-fn set_world_pixel(canvas: &mut Canvas, x: usize, y: usize, color: &Color) {
-    let y = canvas.height() - y - 1;
-
-    canvas.write_pixel(x, y, *color);
 }

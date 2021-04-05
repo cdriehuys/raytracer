@@ -16,14 +16,13 @@ in the main program. It can be executed with:
 cargo run --release
 ```
 
-### Current Behavior (Ch. 6)
+### Current Behavior (Ch. 7)
 
-Running the application produces a rendering of a sphere utilizing a material
-and light source. The material utilizes ambient, sdiffuse, and specular
-reflections to produce a specific color at each position on the sphere. The
-result is something like:
+The ray tracer now has abstractions for groups of objects that make up a scene
+as well as an abstraction for positioning the camera. This makes it much easier
+to render scenes with multiple objects, like the following:
 
-![Ray traced sphere](https://user-images.githubusercontent.com/4708504/113493009-aaff6d80-9490-11eb-9430-f4386fff04ea.png)
+![Scene with multiple objects](https://user-images.githubusercontent.com/4708504/113522646-33484600-9557-11eb-9dbe-ca98847cb582.png)
 
 ### History
 
@@ -59,6 +58,14 @@ space towards a "wall" behind the sphere. Locations on the wall are colored red
 if the ray hits the sphere. This produces an image like:
 
 ![Ray traced sphere silhouette](https://user-images.githubusercontent.com/4708504/113485288-99eb3800-9461-11eb-87ba-c232ccf0587b.png)
+
+#### Light and Shading (Ch. 6)
+
+Objects now have an associated material. The material utilizes ambient, diffuse,
+and specular reflections to produce a specific color at each position on the
+sphere. When rendered with a light source, the sphere looks like:
+
+![Ray traced sphere](https://user-images.githubusercontent.com/4708504/113493009-aaff6d80-9490-11eb-9430-f4386fff04ea.png)
 
 </details>
 

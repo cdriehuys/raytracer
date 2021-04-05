@@ -19,6 +19,10 @@ impl Sphere {
             transform: self.transform.clone(),
         }
     }
+
+    pub fn with_transform(&self, transform: Matrix) -> Self {
+        Self { transform, ..*self }
+    }
 }
 
 impl WorldObject for Sphere {
