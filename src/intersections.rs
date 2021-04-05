@@ -1,16 +1,16 @@
 use float_cmp::approx_eq;
-
-use crate::objects::WorldObject;
 use std::{fmt::Debug, ops};
+
+use crate::{linear::Tuple, objects::WorldObject, Ray};
 
 /// A representation of a ray's intersection with a world object.
 #[derive(Debug)]
-pub struct Intersection {
+pub struct Intersection<'a> {
     t: f64,
-    object: Box<dyn WorldObject>,
+    object: &'a dyn WorldObject,
 }
 
-impl Intersection {
+impl<'a> Intersection<'a> {
     /// Construct a new intersection.
     ///
     /// # Arguments
@@ -22,22 +22,15 @@ impl Intersection {
     ///
     /// ```
     /// # use raytracer::intersections::Intersection;
-    /// # use raytracer::objects::Sphere;
+    /// # use raytracer::objects::{Sphere, WorldObject};
     /// let sphere = Sphere::default();
     ///
-    /// let intersection = Intersection::new(3.5, Box::new(sphere.clone()));
+    /// let intersection = Intersection::new(3.5, &sphere);
     ///
     /// assert_eq!(intersection.t(), 3.5);
-    ///
-    /// // It's possible to obtain the original object, but painful. The methods
-    /// // from WorldObject should be comprehensive enough that downcasting is
-    /// // only needed in tests.
-    /// assert_eq!(
-    ///     *(intersection.object().as_any().downcast_ref::<Sphere>().unwrap()),
-    ///     sphere,
-    /// );
+    /// assert_eq!(intersection.object(), sphere.as_trait());
     /// ```
-    pub fn new(t: f64, object: Box<dyn WorldObject>) -> Self {
+    pub fn new(t: f64, object: &'a dyn WorldObject) -> Self {
         Self { t, object }
     }
 
@@ -45,24 +38,114 @@ impl Intersection {
         self.t
     }
 
-    pub fn object(&self) -> &dyn WorldObject {
-        &*self.object
+    pub fn object(&self) -> &'a dyn WorldObject {
+        self.object
+    }
+
+    /// Precompute information about an intersection.
+    ///
+    /// # Arguments
+    ///
+    /// * `ray` - The ray used in the intersection.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use raytracer::{
+    ///     intersections::Intersection,
+    ///     linear::Tuple,
+    ///     objects::{Sphere, WorldObject},
+    ///     Ray,
+    /// };
+    /// let r = Ray::new(Tuple::new_point(0, 0, -5), Tuple::new_vector(0, 0, 1));
+    /// let shape = Sphere::default();
+    /// let i = Intersection::new(4.0, &shape);
+    ///
+    /// let info = i.prepare_info(&r);
+    ///
+    /// assert_eq!(info.t(), 4.0);
+    /// assert_eq!(info.object(), shape.as_trait());
+    /// assert_eq!(info.point(), Tuple::new_point(0, 0, -1));
+    /// assert_eq!(info.eye_vec(), Tuple::new_vector(0, 0, -1));
+    /// assert_eq!(info.normal_vec(), Tuple::new_vector(0, 0, -1));
+    /// ```
+    pub fn prepare_info(&self, ray: &Ray) -> IntersectionInfo {
+        let point = ray.position_at(self.t);
+        let eye_vec = -ray.direction();
+        let mut normal_vec = self.object.normal_at(&point);
+
+        // The normal vector always points to the outside of the shape. If the
+        // hit comes from inside the shape, the eye vector and normal vector
+        // will point in opposite directions, causing the surface to be far
+        // darker than it should be. If the hit comes from the inside, we have
+        // to invert the normal vector to get the correct shading.
+        let inside = normal_vec.dot(eye_vec) < 0.0;
+        if inside {
+            normal_vec = -normal_vec;
+        }
+
+        IntersectionInfo {
+            t: self.t,
+            object: self.object,
+            point,
+            eye_vec,
+            normal_vec,
+            inside,
+        }
     }
 }
 
-impl PartialEq for Intersection {
-    fn eq(&self, other: &Intersection) -> bool {
-        approx_eq!(f64, self.t, other.t) && &*self.object == &*other.object
+impl<'a, 'b> PartialEq<Intersection<'b>> for Intersection<'a> {
+    fn eq(&self, other: &Intersection<'b>) -> bool {
+        approx_eq!(f64, self.t, other.t) && self.object == other.object
+    }
+}
+
+/// Additional information about an intersection that is useful when performing
+/// lighting calculations.
+#[derive(Debug)]
+pub struct IntersectionInfo<'a> {
+    t: f64,
+    object: &'a dyn WorldObject,
+    point: Tuple,
+    eye_vec: Tuple,
+    inside: bool,
+    normal_vec: Tuple,
+}
+
+impl<'a> IntersectionInfo<'a> {
+    pub fn t(&self) -> f64 {
+        self.t
+    }
+
+    pub fn object(&self) -> &'a dyn WorldObject {
+        &*self.object
+    }
+
+    pub fn point(&self) -> Tuple {
+        self.point
+    }
+
+    pub fn eye_vec(&self) -> Tuple {
+        self.eye_vec
+    }
+
+    pub fn normal_vec(&self) -> Tuple {
+        self.normal_vec
+    }
+
+    pub fn inside(&self) -> bool {
+        self.inside
     }
 }
 
 /// A collection of intersections.
 #[derive(Debug, Default)]
-pub struct Intersections {
-    intersections: Vec<Intersection>,
+pub struct Intersections<'a> {
+    intersections: Vec<Intersection<'a>>,
 }
 
-impl Intersections {
+impl<'a> Intersections<'a> {
     /// Create a new collection of intersections.
     ///
     /// The provided intersections will be sorted by their `t` value.
@@ -77,8 +160,8 @@ impl Intersections {
     /// # use raytracer::intersections::{Intersection, Intersections};
     /// # use raytracer::objects::Sphere;
     /// let sphere = Sphere::default();
-    /// let i1 = Intersection::new(1.0, Box::new(sphere.clone()));
-    /// let i2 = Intersection::new(2.0, Box::new(sphere.clone()));
+    /// let i1 = Intersection::new(1.0, &sphere);
+    /// let i2 = Intersection::new(2.0, &sphere);
     ///
     /// let intersections = Intersections::new(vec![i1, i2]);
     ///
@@ -86,7 +169,7 @@ impl Intersections {
     /// assert_eq!(intersections[0].t(), 1.0);
     /// assert_eq!(intersections[1].t(), 2.0);
     /// ```
-    pub fn new(mut intersections: Vec<Intersection>) -> Self {
+    pub fn new(mut intersections: Vec<Intersection<'a>>) -> Self {
         intersections.sort_by(|a, b| a.t.partial_cmp(&b.t).unwrap());
 
         Self { intersections }
@@ -99,7 +182,7 @@ impl Intersections {
     /// # Arguments
     ///
     /// * `intersections` - The intersections to add to the collection.
-    pub fn add_intersections(&mut self, intersections: Intersections) {
+    pub fn add_intersections(&mut self, intersections: Intersections<'a>) {
         for intersection in intersections.intersections.into_iter() {
             match self
                 .intersections
@@ -124,8 +207,8 @@ impl Intersections {
     }
 }
 
-impl ops::Index<usize> for Intersections {
-    type Output = Intersection;
+impl<'a> ops::Index<usize> for Intersections<'a> {
+    type Output = Intersection<'a>;
 
     fn index(&self, index: usize) -> &Self::Output {
         &self.intersections[index]

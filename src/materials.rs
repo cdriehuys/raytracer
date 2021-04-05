@@ -26,6 +26,10 @@ impl Material {
         self.ambient
     }
 
+    pub fn with_ambient(&self, ambient: f64) -> Self {
+        Self { ambient, ..*self }
+    }
+
     pub fn diffuse(&self) -> f64 {
         self.diffuse
     }

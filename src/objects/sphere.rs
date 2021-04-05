@@ -26,6 +26,10 @@ impl WorldObject for Sphere {
         self
     }
 
+    fn as_trait(&self) -> &dyn WorldObject {
+        self as &dyn WorldObject
+    }
+
     /// Intersect a ray with the sphere and return a vector containing the
     /// values of *t* when the ray hits the sphere.
     ///
@@ -54,14 +58,18 @@ impl WorldObject for Sphere {
         let t1 = (-b - discriminant.sqrt()) / (2.0 * a);
         let t2 = (-b + discriminant.sqrt()) / (2.0 * a);
 
-        let i1 = Intersection::new(t1, Box::new(self.clone()));
-        let i2 = Intersection::new(t2, Box::new(self.clone()));
+        let i1 = Intersection::new(t1, self);
+        let i2 = Intersection::new(t2, self);
 
         Intersections::new(vec![i1, i2])
     }
 
     fn material(&self) -> &Material {
         &self.material
+    }
+
+    fn set_material(&mut self, material: Material) {
+        self.material = material;
     }
 
     fn normal_at(&self, point: &Tuple) -> Tuple {
