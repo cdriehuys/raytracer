@@ -16,13 +16,14 @@ in the main program. It can be executed with:
 cargo run --release
 ```
 
-### Current Behavior (Ch. 7)
+### Current Behavior (Ch. 8)
 
-The ray tracer now has abstractions for groups of objects that make up a scene
-as well as an abstraction for positioning the camera. This makes it much easier
-to render scenes with multiple objects, like the following:
+Shadows have now been added. For each rendered pixel of an object, we do an
+additional ray cast towards the light source to determine if there is direct
+light cast at that particular point. If not, then the location is in shadow, and
+only the material's ambient reflection affects the final color
 
-![Scene with multiple objects](https://user-images.githubusercontent.com/4708504/113522646-33484600-9557-11eb-9dbe-ca98847cb582.png)
+![Scene with multiple objects casting shadows](https://user-images.githubusercontent.com/4708504/113627022-bf21a700-9617-11eb-80a4-a1422361fe06.png)
 
 ### History
 
@@ -66,6 +67,14 @@ and specular reflections to produce a specific color at each position on the
 sphere. When rendered with a light source, the sphere looks like:
 
 ![Ray traced sphere](https://user-images.githubusercontent.com/4708504/113493009-aaff6d80-9490-11eb-9430-f4386fff04ea.png)
+
+### Making a Scene (Ch. 7)
+
+The ray tracer now has abstractions for groups of objects that make up a scene
+as well as an abstraction for positioning the camera. This makes it much easier
+to render scenes with multiple objects, like the following:
+
+![Scene with multiple objects](https://user-images.githubusercontent.com/4708504/113522646-33484600-9557-11eb-9dbe-ca98847cb582.png)
 
 </details>
 

@@ -84,10 +84,14 @@ impl<'a> Intersection<'a> {
             normal_vec = -normal_vec;
         }
 
+        // Compute the offset point used for shadow calculations.
+        let over_point = point + normal_vec * 1e-5;
+
         IntersectionInfo {
             t: self.t,
             object: self.object,
             point,
+            over_point,
             eye_vec,
             normal_vec,
             inside,
@@ -108,6 +112,7 @@ pub struct IntersectionInfo<'a> {
     t: f64,
     object: &'a dyn WorldObject,
     point: Tuple,
+    over_point: Tuple,
     eye_vec: Tuple,
     inside: bool,
     normal_vec: Tuple,
@@ -124,6 +129,17 @@ impl<'a> IntersectionInfo<'a> {
 
     pub fn point(&self) -> Tuple {
         self.point
+    }
+
+    /// Get a point slightly offset from the computed intersection point in the
+    /// direction of the normal vector.
+    ///
+    /// This is necessary because when we try to determine if the intersection
+    /// is shadowed, floating point inaccuracies can cause the surface of the
+    /// shape to shadow itself. If we use this slightly offset point instead,
+    /// the problem is eliminated.
+    pub fn over_point(&self) -> Tuple {
+        self.over_point
     }
 
     pub fn eye_vec(&self) -> Tuple {

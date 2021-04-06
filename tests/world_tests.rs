@@ -1,6 +1,9 @@
 use raytracer::{
-    intersections::Intersection, lights::PointLight, linear::Tuple, objects::WorldObject, Color,
-    Ray, World, DEFAULT_SPHERE_1, DEFAULT_SPHERE_2,
+    intersections::Intersection,
+    lights::PointLight,
+    linear::{Matrix, Tuple},
+    objects::{Sphere, WorldObject},
+    Color, Ray, World, DEFAULT_SPHERE_1, DEFAULT_SPHERE_2,
 };
 
 #[test]
@@ -18,6 +21,38 @@ fn intersect_default_world() {
     assert_eq!(intersections[1].t(), 4.5);
     assert_eq!(intersections[2].t(), 5.5);
     assert_eq!(intersections[3].t(), 6.0);
+}
+
+#[test]
+fn is_shadowed_no_obstruction() {
+    let w = World::default();
+    let p = Tuple::new_point(0, 10, 0);
+
+    assert!(!w.is_shadowed(&p));
+}
+
+#[test]
+fn is_shadowed_obstruction() {
+    let w = World::default();
+    let p = Tuple::new_point(10, -10, 10);
+
+    assert!(w.is_shadowed(&p))
+}
+
+#[test]
+fn is_shadowed_object_behind_light() {
+    let w = World::default();
+    let p = Tuple::new_point(-20, 20, -20);
+
+    assert!(!w.is_shadowed(&p));
+}
+
+#[test]
+fn is_shadowed_object_behind_point() {
+    let w = World::default();
+    let p = Tuple::new_point(-2, 2, -2);
+
+    assert!(!w.is_shadowed(&p));
 }
 
 #[test]
@@ -46,6 +81,29 @@ fn shade_hit_inside() {
     let c = w.shade_hit(&info);
 
     assert_eq!(c, Color::new(0.90498, 0.90498, 0.90498));
+}
+
+#[test]
+fn shade_hit_in_shadow() {
+    let light = PointLight::new(Tuple::new_point(0, 0, -10), Color::new(1, 1, 1));
+    let s1 = Sphere::default();
+    let s2 = Sphere::default().with_transform(Matrix::translation(0, 0, 10));
+
+    let w = {
+        let mut world = World::new();
+        world.light = Some(&light);
+        world.objects = vec![&s1, &s2];
+
+        world
+    };
+
+    let r = Ray::new(Tuple::new_point(0, 0, 5), Tuple::new_vector(0, 0, 1));
+    let i = Intersection::new(4.0, &s2);
+
+    let info = i.prepare_info(&r);
+    let c = w.shade_hit(&info);
+
+    assert_eq!(c, Color::new(0.1, 0.1, 0.1));
 }
 
 #[test]

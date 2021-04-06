@@ -51,6 +51,37 @@ impl<'a> World<'a> {
         }
     }
 
+    /// Determine if a point is in shadow or not.
+    ///
+    /// A point is shadowed if the ray from the point to the light source
+    /// intersects with any objects.
+    ///
+    /// # Arguments
+    ///
+    /// * `point` - The location in the world to perform a shadow check for.
+    pub fn is_shadowed(&self, point: &Tuple) -> bool {
+        let light = match self.light {
+            Some(light) => light,
+            None => return true,
+        };
+
+        let to_light = light.position() - *point;
+        let distance = to_light.magnitude();
+        let direction = to_light.normalized();
+
+        let r = Ray::new(*point, direction);
+        let intersections = self.intersect(&r);
+
+        match intersections.hit() {
+            // We can compare t to distance because our ray was normalized, so
+            // it travels one world unit per unit time.
+            Some(hit) => hit.t() < distance,
+
+            // No hit means no obstacle
+            None => false,
+        }
+    }
+
     /// Compute the color of the world by casting a ray into it.
     ///
     /// If the ray does not hit any of the objects in the world, the color
@@ -99,11 +130,14 @@ impl<'a> World<'a> {
             None => PointLight::new(Tuple::new_point(0, 0, 0), Color::new(0, 0, 0)),
         };
 
+        let is_shadowed = self.is_shadowed(&hit_info.over_point());
+
         hit_info.object().material().light(
             &light,
             &hit_info.point(),
             &hit_info.eye_vec(),
             &hit_info.normal_vec(),
+            is_shadowed,
         )
     }
 }

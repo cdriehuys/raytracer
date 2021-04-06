@@ -1,6 +1,6 @@
 use raytracer::{
     intersections::{Intersection, Intersections},
-    linear::Tuple,
+    linear::{Matrix, Tuple},
     objects::Sphere,
     Ray,
 };
@@ -83,4 +83,16 @@ fn prepare_info_inside_hit() {
     assert_eq!(info.eye_vec(), Tuple::new_vector(0, 0, -1));
     assert_eq!(info.inside(), true);
     assert_eq!(info.normal_vec(), Tuple::new_vector(0, 0, -1));
+}
+
+#[test]
+fn prepare_info_offset_point() {
+    let r = Ray::new(Tuple::new_point(0, 0, -5), Tuple::new_vector(0, 0, 1));
+    let shape = Sphere::default().with_transform(Matrix::translation(0, 0, 1));
+    let i = Intersection::new(5.0, &shape);
+
+    let info = i.prepare_info(&r);
+
+    assert!(info.over_point().z() < -1e-5_f64 / 2.0);
+    assert!(info.point().z() > info.over_point().z());
 }

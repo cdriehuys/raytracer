@@ -60,21 +60,31 @@ impl Material {
     /// * `eye_v` - The vector pointing from the illuminated point towards the
     ///   "eye" or camera.
     /// * `normal_v` - The normal vector of the surface being lit.
+    /// * `in_shadow` - A boolean indicating if the point does not have direct
+    ///   line of sight to the light source.
     pub fn light(
         &self,
         light: &PointLight,
         position: &Tuple,
         eye_v: &Tuple,
         normal_v: &Tuple,
+        in_shadow: bool,
     ) -> Color {
         // Combine surface color with light color.
         let effective_color = self.color * light.intensity();
 
-        // Get a vector from the point being lit towards the light source.
-        let light_v = (light.position() - *position).normalized();
-
         // The ambient contribution only depends on the effective color.
         let ambient = effective_color * self.ambient;
+
+        // If the point is shadowed, the ambient reflection is the only part
+        // that matters since the diffuse and specular reflections depend on a
+        // direct light source.
+        if in_shadow {
+            return ambient;
+        }
+
+        // Get a vector from the point being lit towards the light source.
+        let light_v = (light.position() - *position).normalized();
 
         let diffuse: Color;
         let specular: Color;
