@@ -16,14 +16,14 @@ in the main program. It can be executed with:
 cargo run --release
 ```
 
-### Current Behavior (Ch. 8)
+### Current Behavior (Ch. 9)
 
-Shadows have now been added. For each rendered pixel of an object, we do an
-additional ray cast towards the light source to determine if there is direct
-light cast at that particular point. If not, then the location is in shadow, and
-only the material's ambient reflection affects the final color
+We have our first alternate shape type: planes. Planes allow us to replace our
+hacky floors/walls made of deformed spheres with proper infinite, flat planes.
+This isn't a huge visual change, but there was a significant amount of
+refactoring to make it easier to share logic between shapes.
 
-![Scene with multiple objects casting shadows](https://user-images.githubusercontent.com/4708504/113627022-bf21a700-9617-11eb-80a4-a1422361fe06.png)
+![Scene with spheres and a plane](https://user-images.githubusercontent.com/4708504/114291028-ed005480-9a38-11eb-9826-be4564a69b80.png)
 
 ### History
 
@@ -68,13 +68,22 @@ sphere. When rendered with a light source, the sphere looks like:
 
 ![Ray traced sphere](https://user-images.githubusercontent.com/4708504/113493009-aaff6d80-9490-11eb-9430-f4386fff04ea.png)
 
-### Making a Scene (Ch. 7)
+#### Making a Scene (Ch. 7)
 
 The ray tracer now has abstractions for groups of objects that make up a scene
 as well as an abstraction for positioning the camera. This makes it much easier
 to render scenes with multiple objects, like the following:
 
 ![Scene with multiple objects](https://user-images.githubusercontent.com/4708504/113522646-33484600-9557-11eb-9dbe-ca98847cb582.png)
+
+#### Shadows (Ch. 8)
+
+Shadows have now been added. For each rendered pixel of an object, we do an
+additional ray cast towards the light source to determine if there is direct
+light cast at that particular point. If not, then the location is in shadow, and
+only the material's ambient reflection affects the final color.
+
+![Scene with multiple objects casting shadows](https://user-images.githubusercontent.com/4708504/113627022-bf21a700-9617-11eb-80a4-a1422361fe06.png)
 
 </details>
 
