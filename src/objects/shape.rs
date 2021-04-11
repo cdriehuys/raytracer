@@ -57,6 +57,11 @@ pub trait Shape: std::fmt::Debug {
         self.base_shape_mut().set_material(material);
     }
 
+    /// Retrieve the object's unique ID.
+    fn object_id(&self) -> usize {
+        self.base_shape().object_id()
+    }
+
     /// Retrieve the shape's transform.
     fn transform(&self) -> &Matrix {
         self.base_shape().transform()
@@ -109,7 +114,11 @@ pub trait Shape: std::fmt::Debug {
 }
 
 impl PartialEq for &dyn Shape {
-    fn eq(&self, _other: &Self) -> bool {
-        true
+    fn eq(&self, other: &Self) -> bool {
+        // We only use shape equality in test cases where we already have a
+        // reference to the object we expect to see, so we can do this ID
+        // comparison. This check will break down if we need to be able to
+        // construct expected objects from their material/transform.
+        self.object_id() == other.object_id()
     }
 }

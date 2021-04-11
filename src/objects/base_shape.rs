@@ -4,10 +4,11 @@ use crate::{
     Material, Ray,
 };
 
-use super::Shape;
+use super::{ObjectID, Shape};
 
 #[derive(Clone, Debug)]
 pub struct BaseShape {
+    id: ObjectID,
     material: Material,
     transform: Matrix,
 }
@@ -15,6 +16,7 @@ pub struct BaseShape {
 impl Default for BaseShape {
     fn default() -> Self {
         Self {
+            id: ObjectID::default(),
             material: Material::default(),
             transform: Matrix::identity_4(),
         }
@@ -44,6 +46,10 @@ impl Shape for BaseShape {
 
     fn set_material(&mut self, material: Material) {
         self.material = material;
+    }
+
+    fn object_id(&self) -> usize {
+        self.id.id()
     }
 
     fn transform(&self) -> &Matrix {

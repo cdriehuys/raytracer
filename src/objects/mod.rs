@@ -1,4 +1,6 @@
 mod base_shape;
+mod object_id;
+mod plane;
 mod shape;
 mod sphere;
 
@@ -9,6 +11,8 @@ mod test_shape;
 
 // Allow other shapes to utilize the base shape, but don't expose it publicly.
 use base_shape::BaseShape;
+use object_id::ObjectID;
 
+pub use plane::Plane;
 pub use shape::Shape;
 pub use sphere::Sphere;
