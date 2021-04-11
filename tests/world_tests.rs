@@ -2,7 +2,7 @@ use raytracer::{
     intersections::Intersection,
     lights::PointLight,
     linear::{Matrix, Tuple},
-    objects::{Sphere, WorldObject},
+    objects::{Shape, Sphere},
     Color, Ray, World, DEFAULT_SPHERE_1, DEFAULT_SPHERE_2,
 };
 
@@ -87,7 +87,8 @@ fn shade_hit_inside() {
 fn shade_hit_in_shadow() {
     let light = PointLight::new(Tuple::new_point(0, 0, -10), Color::new(1, 1, 1));
     let s1 = Sphere::default();
-    let s2 = Sphere::default().with_transform(Matrix::translation(0, 0, 10));
+    let mut s2 = Sphere::default();
+    s2.set_transform(Matrix::translation(0, 0, 10));
 
     let w = {
         let mut world = World::new();
@@ -129,8 +130,12 @@ fn color_at_hit() {
 #[test]
 fn color_with_intersection_behind_ray() {
     let mut w = World::default();
-    let outer = DEFAULT_SPHERE_1.with_material(DEFAULT_SPHERE_1.material().with_ambient(1.0));
-    let inner = DEFAULT_SPHERE_2.with_material(DEFAULT_SPHERE_2.material().with_ambient(1.0));
+
+    let mut outer = DEFAULT_SPHERE_1.clone();
+    outer.set_material(DEFAULT_SPHERE_1.material().with_ambient(1.0));
+    let mut inner = DEFAULT_SPHERE_2.clone();
+    inner.set_material(DEFAULT_SPHERE_2.material().with_ambient(1.0));
+
     w.objects = vec![&outer, &inner];
 
     let r = Ray::new(

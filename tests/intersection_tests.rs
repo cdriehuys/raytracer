@@ -1,7 +1,7 @@
 use raytracer::{
     intersections::{Intersection, Intersections},
     linear::{Matrix, Tuple},
-    objects::Sphere,
+    objects::{Shape, Sphere},
     Ray,
 };
 
@@ -88,7 +88,8 @@ fn prepare_info_inside_hit() {
 #[test]
 fn prepare_info_offset_point() {
     let r = Ray::new(Tuple::new_point(0, 0, -5), Tuple::new_vector(0, 0, 1));
-    let shape = Sphere::default().with_transform(Matrix::translation(0, 0, 1));
+    let mut shape = Sphere::default();
+    shape.set_transform(Matrix::translation(0, 0, 1));
     let i = Intersection::new(5.0, &shape);
 
     let info = i.prepare_info(&r);

@@ -1,54 +1,28 @@
-use std::any::Any;
-
 use crate::intersections::{Intersection, Intersections};
-use crate::linear::{Matrix, Tuple};
-use crate::{Material, Ray};
+use crate::linear::Tuple;
+use crate::Ray;
 
-use super::WorldObject;
+use super::{BaseShape, Shape};
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct Sphere {
-    material: Material,
-    transform: Matrix,
+    base: BaseShape,
 }
 
-impl Sphere {
-    pub fn with_material(&self, material: Material) -> Self {
-        Self {
-            material,
-            transform: self.transform.clone(),
-        }
+impl Shape for Sphere {
+    fn base_shape(&self) -> &BaseShape {
+        &self.base
     }
 
-    pub fn with_transform(&self, transform: Matrix) -> Self {
-        Self { transform, ..*self }
-    }
-}
-
-impl WorldObject for Sphere {
-    fn as_any(&self) -> &dyn Any {
-        self
+    fn base_shape_mut(&mut self) -> &mut BaseShape {
+        &mut self.base
     }
 
-    fn as_trait(&self) -> &dyn WorldObject {
-        self as &dyn WorldObject
-    }
+    fn intersect_local(&self, ray: &Ray) -> Intersections {
+        let sphere_to_ray = ray.origin() - Tuple::new_point(0, 0, 0);
 
-    /// Intersect a ray with the sphere and return a vector containing the
-    /// values of *t* when the ray hits the sphere.
-    ///
-    /// # Arguments
-    ///
-    /// * `ray` - The ray to determine intersections for.
-    fn intersect(&self, ray: &Ray) -> Intersections {
-        // Create an object-space (as opposed to world-space) copy of the ray so
-        // that the sphere's transform impacts the operation.
-        let object_ray = ray.transformed(&self.transform.inverted());
-
-        let sphere_to_ray = object_ray.origin() - Tuple::new_point(0, 0, 0);
-
-        let a = object_ray.direction().dot(object_ray.direction());
-        let b = 2.0 * object_ray.direction().dot(sphere_to_ray);
+        let a = ray.direction().dot(ray.direction());
+        let b = 2.0 * ray.direction().dot(sphere_to_ray);
         let c = sphere_to_ray.dot(sphere_to_ray) - 1.0;
 
         let discriminant = (b * b) - 4.0 * a * c;
@@ -68,62 +42,128 @@ impl WorldObject for Sphere {
         Intersections::new(vec![i1, i2])
     }
 
-    fn material(&self) -> &Material {
-        &self.material
-    }
-
-    fn set_material(&mut self, material: Material) {
-        self.material = material;
-    }
-
-    fn normal_at(&self, point: &Tuple) -> Tuple {
-        let object_point = &self.transform.inverted() * *point;
-        let object_normal = object_point - Tuple::new_point(0, 0, 0);
-
-        let world_normal = &self.transform.inverted().transposed() * object_normal;
-        let world_normal = Tuple::new(world_normal.x(), world_normal.y(), world_normal.z(), 0.0);
-
-        world_normal.normalized()
-    }
-
-    fn transform(&self) -> &Matrix {
-        &self.transform
-    }
-
-    /// Apply a new transformation matrix to the sphere.
-    ///
-    /// # Arguments
-    ///
-    /// * `transform` - The sphere's new transformation matrix.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// # use raytracer::linear::Matrix;
-    /// # use raytracer::objects::{Sphere, WorldObject};
-    /// let mut s = Sphere::default();
-    /// let t = Matrix::translation(2, 3, 4);
-    ///
-    /// s.set_transform(t.clone());
-    ///
-    /// assert_eq!(*s.transform(), t);
-    /// ```
-    fn set_transform(&mut self, transform: Matrix) {
-        self.transform = transform;
+    fn normal_at_local(&self, point: &Tuple) -> Tuple {
+        *point - Tuple::new_point(0, 0, 0)
     }
 }
 
-impl Default for Sphere {
-    fn default() -> Self {
-        Self {
-            material: Material::default(),
-            transform: Matrix::identity_4(),
-        }
-    }
-}
+#[cfg(test)]
+mod test {
+    use super::*;
 
-impl PartialEq for Sphere {
-    fn eq(&self, _: &Sphere) -> bool {
-        true
+    #[test]
+    fn intersect_local_two_points() {
+        let ray = Ray::new(Tuple::new_point(0, 0, -5), Tuple::new_vector(0, 0, 1));
+        let sphere = Sphere::default();
+
+        let intersections = sphere.intersect_local(&ray);
+
+        assert_eq!(intersections.len(), 2);
+        assert_eq!(intersections[0].t(), 4.0);
+        assert_eq!(intersections[1].t(), 6.0);
+    }
+
+    #[test]
+    fn intersect_local_tangent() {
+        let ray = Ray::new(Tuple::new_point(0, 1, -5), Tuple::new_vector(0, 0, 1));
+        let sphere = Sphere::default();
+
+        let intersections = sphere.intersect_local(&ray);
+
+        assert_eq!(intersections.len(), 2);
+        assert_eq!(intersections[0].t(), 5.0);
+        assert_eq!(intersections[1].t(), 5.0);
+    }
+
+    #[test]
+    fn intersect_local_no_hits() {
+        let ray = Ray::new(Tuple::new_point(0, 2, -5), Tuple::new_vector(0, 0, 1));
+        let sphere = Sphere::default();
+
+        let intersections = sphere.intersect_local(&ray);
+
+        assert_eq!(intersections.len(), 0);
+    }
+
+    #[test]
+    fn intersect_local_origin_inside_sphere() {
+        let ray = Ray::new(Tuple::new_point(0, 0, 0), Tuple::new_vector(0, 0, 1));
+        let sphere = Sphere::default();
+
+        let intersections = sphere.intersect_local(&ray);
+
+        assert_eq!(intersections.len(), 2);
+        assert_eq!(intersections[0].t(), -1.0);
+        assert_eq!(intersections[1].t(), 1.0);
+    }
+
+    #[test]
+    fn intersect_local_ray_in_front_of_sphere() {
+        let ray = Ray::new(Tuple::new_point(0, 0, 5), Tuple::new_vector(0, 0, 1));
+        let sphere = Sphere::default();
+
+        let intersections = sphere.intersect_local(&ray);
+
+        assert_eq!(intersections.len(), 2);
+        assert_eq!(intersections[0].t(), -6.0);
+        assert_eq!(intersections[1].t(), -4.0);
+    }
+
+    #[test]
+    fn normal_at_local_on_x_axis() {
+        let s = Sphere::default();
+
+        let n = s.normal_at_local(&Tuple::new_point(1, 0, 0));
+
+        assert_eq!(n, Tuple::new_vector(1, 0, 0));
+    }
+
+    #[test]
+    fn normal_at_local_on_y_axis() {
+        let s = Sphere::default();
+
+        let n = s.normal_at_local(&Tuple::new_point(0, 1, 0));
+
+        assert_eq!(n, Tuple::new_vector(0, 1, 0));
+    }
+
+    #[test]
+    fn normal_at_local_on_z_axis() {
+        let s = Sphere::default();
+
+        let n = s.normal_at_local(&Tuple::new_point(0, 0, 1));
+
+        assert_eq!(n, Tuple::new_vector(0, 0, 1));
+    }
+
+    #[test]
+    fn normal_at_local_non_axial_point() {
+        let s = Sphere::default();
+        let sqrt_3_over_3 = (3.0 as f64).sqrt() / 3.0;
+
+        let n = s.normal_at_local(&Tuple::new_point(
+            sqrt_3_over_3,
+            sqrt_3_over_3,
+            sqrt_3_over_3,
+        ));
+
+        assert_eq!(
+            n,
+            Tuple::new_vector(sqrt_3_over_3, sqrt_3_over_3, sqrt_3_over_3)
+        );
+    }
+
+    #[test]
+    fn normal_at_local_is_normalized() {
+        let s = Sphere::default();
+        let sqrt_3_over_3 = (3.0 as f64).sqrt() / 3.0;
+
+        let n = s.normal_at_local(&Tuple::new_point(
+            sqrt_3_over_3,
+            sqrt_3_over_3,
+            sqrt_3_over_3,
+        ));
+
+        assert_eq!(n, n.normalized());
     }
 }

@@ -2,7 +2,7 @@ use crate::{
     intersections::{IntersectionInfo, Intersections},
     lights::PointLight,
     linear::{Matrix, Tuple},
-    objects::{Sphere, WorldObject},
+    objects::{Shape, Sphere},
     Color, Material, Ray,
 };
 
@@ -12,12 +12,17 @@ lazy_static! {
 
     pub static ref DEFAULT_LIGHT: PointLight = PointLight::new(Tuple::new_point(-10, 10, -10), Color::new(1, 1, 1));
 
-    pub static ref DEFAULT_SPHERE_1: Sphere = Sphere::default().with_material(
-        Material::default()
-            .with_color(Color::new(0.8, 1.0, 0.6))
-            .with_diffuse(0.7)
-            .with_specular(0.2),
-    );
+    pub static ref DEFAULT_SPHERE_1: Sphere = {
+        let mut sphere = Sphere::default();
+        sphere.set_material(
+            Material::default()
+                .with_color(Color::new(0.8, 1.0, 0.6))
+                .with_diffuse(0.7)
+                .with_specular(0.2),
+        );
+
+        sphere
+    };
     pub static ref DEFAULT_SPHERE_2: Sphere = {
         let mut sphere = Sphere::default();
         sphere.set_transform(Matrix::scaling(0.5, 0.5, 0.5));
@@ -28,7 +33,7 @@ lazy_static! {
 
 #[derive(Debug)]
 pub struct World<'a> {
-    pub objects: Vec<&'a dyn WorldObject>,
+    pub objects: Vec<&'a dyn Shape>,
     pub light: Option<&'a PointLight>,
 }
 
@@ -157,7 +162,7 @@ impl<'a> Default for World<'a> {
     fn default() -> Self {
         Self {
             light: Some(&DEFAULT_LIGHT),
-            objects: vec![DEFAULT_SPHERE_1.as_trait(), DEFAULT_SPHERE_2.as_trait()],
+            objects: vec![&*DEFAULT_SPHERE_1, &*DEFAULT_SPHERE_2],
         }
     }
 }

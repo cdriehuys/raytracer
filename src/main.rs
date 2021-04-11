@@ -8,63 +8,87 @@ use raytracer::{
     camera::{view_transform, Camera},
     canvas::renderers::render_as_ppm,
     linear::{Matrix, Tuple},
-    objects::{Sphere, WorldObject},
+    objects::{Shape, Sphere},
     Color, Material, World,
 };
 
 fn main() {
-    let floor = Sphere::default()
-        .with_transform(Matrix::scaling(10, 0.01, 10))
-        .with_material(
+    let floor = {
+        let mut floor = Sphere::default();
+        floor.set_transform(Matrix::scaling(10, 0.01, 10));
+        floor.set_material(
             Material::default()
                 .with_color(Color::new(1, 0.9, 0.9))
                 .with_specular(0.0),
         );
 
-    let left_wall = Sphere::default()
-        .with_transform(
+        floor
+    };
+
+    let left_wall = {
+        let mut left_wall = Sphere::default();
+        left_wall.set_transform(
             &(&(&Matrix::translation(0, 0, 5) * &Matrix::rotation_y(-FRAC_PI_4))
                 * &Matrix::rotation_x(FRAC_PI_2))
                 * &Matrix::scaling(10, 0.01, 10),
-        )
-        .with_material(floor.material().clone());
+        );
+        left_wall.set_material(floor.material().clone());
 
-    let right_wall = Sphere::default()
-        .with_transform(
+        left_wall
+    };
+
+    let right_wall = {
+        let mut right_wall = Sphere::default();
+        right_wall.set_transform(
             &(&(&Matrix::translation(0, 0, 5) * &Matrix::rotation_y(FRAC_PI_4))
                 * &Matrix::rotation_x(FRAC_PI_2))
                 * &Matrix::scaling(10, 0.01, 10),
-        )
-        .with_material(floor.material().clone());
+        );
+        right_wall.set_material(floor.material().clone());
 
-    let middle = Sphere::default()
-        .with_transform(Matrix::translation(-0.5, 1, 0.5))
-        .with_material(
+        right_wall
+    };
+
+    let middle = {
+        let mut middle = Sphere::default();
+        middle.set_transform(Matrix::translation(-0.5, 1, 0.5));
+        middle.set_material(
             Material::default()
                 .with_color(Color::new(0.1, 1, 0.5))
                 .with_diffuse(0.7)
                 .with_specular(0.3),
         );
 
-    let right = Sphere::default()
-        .with_transform(&Matrix::translation(1.5, 0.5, -0.5) * &Matrix::scaling(0.5, 0.5, 0.5))
-        .with_material(
+        middle
+    };
+
+    let right = {
+        let mut right = Sphere::default();
+        right.set_transform(&Matrix::translation(1.5, 0.5, -0.5) * &Matrix::scaling(0.5, 0.5, 0.5));
+        right.set_material(
             Material::default()
                 .with_color(Color::new(0.5, 1, 0.1))
                 .with_diffuse(0.7)
                 .with_specular(0.3),
         );
 
-    let left = Sphere::default()
-        .with_transform(
+        right
+    };
+
+    let left = {
+        let mut left = Sphere::default();
+        left.set_transform(
             &Matrix::translation(-1.5, 0.33, -0.75) * &Matrix::scaling(0.33, 0.33, 0.33),
-        )
-        .with_material(
+        );
+        left.set_material(
             Material::default()
                 .with_color(Color::new(1, 0.8, 0.1))
                 .with_diffuse(0.7)
                 .with_specular(0.3),
         );
+
+        left
+    };
 
     let mut world = World::default();
     world.objects = vec![&floor, &left_wall, &right_wall, &middle, &left, &right];

@@ -1,13 +1,13 @@
 use float_cmp::approx_eq;
 use std::{fmt::Debug, ops};
 
-use crate::{linear::Tuple, objects::WorldObject, Ray};
+use crate::{linear::Tuple, objects::Shape, Ray};
 
 /// A representation of a ray's intersection with a world object.
 #[derive(Debug)]
 pub struct Intersection<'a> {
     t: f64,
-    object: &'a dyn WorldObject,
+    object: &'a dyn Shape,
 }
 
 impl<'a> Intersection<'a> {
@@ -22,15 +22,15 @@ impl<'a> Intersection<'a> {
     ///
     /// ```
     /// # use raytracer::intersections::Intersection;
-    /// # use raytracer::objects::{Sphere, WorldObject};
+    /// # use raytracer::objects::{Sphere, Shape};
     /// let sphere = Sphere::default();
     ///
     /// let intersection = Intersection::new(3.5, &sphere);
     ///
     /// assert_eq!(intersection.t(), 3.5);
-    /// assert_eq!(intersection.object(), sphere.as_trait());
+    /// assert_eq!(intersection.object(), &sphere);
     /// ```
-    pub fn new(t: f64, object: &'a dyn WorldObject) -> Self {
+    pub fn new(t: f64, object: &'a dyn Shape) -> Self {
         Self { t, object }
     }
 
@@ -38,7 +38,7 @@ impl<'a> Intersection<'a> {
         self.t
     }
 
-    pub fn object(&self) -> &'a dyn WorldObject {
+    pub fn object(&self) -> &'a dyn Shape {
         self.object
     }
 
@@ -54,7 +54,7 @@ impl<'a> Intersection<'a> {
     /// # use raytracer::{
     ///     intersections::Intersection,
     ///     linear::Tuple,
-    ///     objects::{Sphere, WorldObject},
+    ///     objects::{Sphere, Shape},
     ///     Ray,
     /// };
     /// let r = Ray::new(Tuple::new_point(0, 0, -5), Tuple::new_vector(0, 0, 1));
@@ -64,7 +64,7 @@ impl<'a> Intersection<'a> {
     /// let info = i.prepare_info(&r);
     ///
     /// assert_eq!(info.t(), 4.0);
-    /// assert_eq!(info.object(), shape.as_trait());
+    /// assert_eq!(info.object(), &shape);
     /// assert_eq!(info.point(), Tuple::new_point(0, 0, -1));
     /// assert_eq!(info.eye_vec(), Tuple::new_vector(0, 0, -1));
     /// assert_eq!(info.normal_vec(), Tuple::new_vector(0, 0, -1));
@@ -110,7 +110,7 @@ impl<'a, 'b> PartialEq<Intersection<'b>> for Intersection<'a> {
 #[derive(Debug)]
 pub struct IntersectionInfo<'a> {
     t: f64,
-    object: &'a dyn WorldObject,
+    object: &'a dyn Shape,
     point: Tuple,
     over_point: Tuple,
     eye_vec: Tuple,
@@ -123,7 +123,7 @@ impl<'a> IntersectionInfo<'a> {
         self.t
     }
 
-    pub fn object(&self) -> &'a dyn WorldObject {
+    pub fn object(&self) -> &'a dyn Shape {
         &*self.object
     }
 
