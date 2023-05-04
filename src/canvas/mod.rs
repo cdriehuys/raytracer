@@ -43,6 +43,17 @@ impl Canvas {
         }
     }
 
+    pub fn from_pixels(pixels: Vec<Vec<Color>>) -> Self {
+        let height = pixels.len();
+        let width = pixels.get(0).map(Vec::len).unwrap_or(0);
+
+        Self {
+            width,
+            height,
+            pixels,
+        }
+    }
+
     /// Get the canvas' width in pixels.
     pub fn width(&self) -> usize {
         self.width

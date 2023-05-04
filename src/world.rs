@@ -33,7 +33,7 @@ lazy_static! {
 
 #[derive(Debug)]
 pub struct World<'a> {
-    pub objects: Vec<&'a dyn Shape>,
+    pub objects: Vec<&'a (dyn Shape + Send + Sync)>,
     pub light: Option<&'a PointLight>,
 }
 
