@@ -1,3 +1,5 @@
+use rayon::prelude::*;
+
 use crate::{
     canvas::Canvas,
     linear::{Matrix, Tuple},
@@ -203,16 +205,19 @@ impl Camera {
     /// let _image = camera.render(&world);
     /// ```
     pub fn render(&self, world: &World) -> Canvas {
-        let mut image = Canvas::new(self.hsize, self.vsize);
+        let pixels = (0..self.vsize)
+            .into_par_iter()
+            .map(|y| {
+                (0..self.hsize)
+                    .into_par_iter()
+                    .map(move |x| {
+                        let ray = self.ray_for_pixel(x, y);
+                        world.color_at(&ray)
+                    })
+                    .collect::<Vec<_>>()
+            })
+            .collect::<Vec<_>>();
 
-        for y in 0..self.vsize {
-            for x in 0..self.hsize {
-                let ray = self.ray_for_pixel(x, y);
-                let color = world.color_at(&ray);
-                image.write_pixel(x, y, color);
-            }
-        }
-
-        image
+        Canvas::from_pixels(pixels)
     }
 }

@@ -397,6 +397,7 @@ dependencies = [
  "criterion",
  "float-cmp",
  "lazy_static",
+ "rayon",
 ]
 
 [[package]]
