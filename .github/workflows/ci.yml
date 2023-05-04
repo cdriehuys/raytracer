@@ -26,10 +26,12 @@ jobs:
       run: cargo fmt -- --check
 
     - name: Build
-      run: cargo build --verbose
+      run: cargo build
 
     - name: Run tests
-      run: cargo test --verbose
+      run: cargo test
 
+    # Run benchmarks as tests because we're not interested in analyzing
+    # performance in the CI build, we just want to make sure they work.
     - name: Run benchmarks
-      run: cargo bench
+      run: cargo test --benches

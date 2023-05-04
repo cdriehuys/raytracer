@@ -4,6 +4,14 @@ version = "0.1.0"
 authors = ["Chathan Driehuys <chathan@driehuys.com>"]
 edition = "2018"
 
+[lib]
+bench = false
+
+[[bin]]
+name = "raytracer"
+path = "src/main.rs"
+bench = false
+
 [[bench]]
 name = "sphere"
 harness = false
