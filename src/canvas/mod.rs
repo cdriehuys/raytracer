@@ -44,8 +44,8 @@ impl Canvas {
     }
 
     pub fn from_pixels(pixels: Vec<Vec<Color>>) -> Self {
-        let height = pixels.len();
-        let width = pixels.get(0).map(Vec::len).unwrap_or(0);
+        let width = pixels.len();
+        let height = pixels.get(0).map(Vec::len).unwrap_or(0);
 
         Self {
             width,

@@ -205,12 +205,12 @@ impl Camera {
     /// let _image = camera.render(&world);
     /// ```
     pub fn render(&self, world: &World) -> Canvas {
-        let pixels = (0..self.vsize)
+        let pixels = (0..self.hsize)
             .into_par_iter()
-            .map(|y| {
-                (0..self.hsize)
+            .map(|x| {
+                (0..self.vsize)
                     .into_par_iter()
-                    .map(move |x| {
+                    .map(move |y| {
                         let ray = self.ray_for_pixel(x, y);
                         world.color_at(&ray)
                     })
