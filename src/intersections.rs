@@ -124,7 +124,7 @@ impl<'a> IntersectionInfo<'a> {
     }
 
     pub fn object(&self) -> &'a dyn Shape {
-        &*self.object
+        self.object
     }
 
     pub fn point(&self) -> Tuple {
@@ -215,6 +215,11 @@ impl<'a> Intersections<'a> {
     /// This is always the intersection with the lowest non-negative `t` value.
     pub fn hit(&self) -> Option<&Intersection> {
         self.intersections.iter().find(|i| i.t >= 0.0)
+    }
+
+    /// Returns `true` if the intersection collection is empty.
+    pub fn is_empty(&self) -> bool {
+        self.intersections.is_empty()
     }
 
     /// Find the number of elements in the intersection collection.

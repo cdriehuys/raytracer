@@ -177,7 +177,7 @@ impl Camera {
         let origin = &transform * Tuple::new_point(0, 0, 0);
         let direction = (pixel - origin).normalized();
 
-        return Ray::new(origin, direction);
+        Ray::new(origin, direction)
     }
 
     /// Render a world using the camera.

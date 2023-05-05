@@ -54,7 +54,11 @@ mod test {
 
         let intersections = p.intersect_local(&r);
 
-        assert_eq!(intersections.len(), 0);
+        assert!(
+            intersections.is_empty(),
+            "Found unexpected intersections: {:?}",
+            intersections
+        );
     }
 
     #[test]
@@ -64,7 +68,11 @@ mod test {
 
         let intersections = p.intersect_local(&r);
 
-        assert_eq!(intersections.len(), 0);
+        assert!(
+            intersections.is_empty(),
+            "Found unexpected intersections: {:?}",
+            intersections
+        );
     }
 
     #[test]
