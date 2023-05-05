@@ -82,7 +82,11 @@ mod test {
 
         let intersections = sphere.intersect_local(&ray);
 
-        assert_eq!(intersections.len(), 0);
+        assert!(
+            intersections.is_empty(),
+            "Found unexpected intersections: {:?}",
+            intersections
+        );
     }
 
     #[test]

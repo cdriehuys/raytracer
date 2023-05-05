@@ -45,6 +45,7 @@ impl Matrix {
     ///     7.0, 8.0, 9.0,
     /// );
     /// ```
+    #[allow(clippy::too_many_arguments)]
     pub fn square_3(
         v1: f64,
         v2: f64,
@@ -76,6 +77,7 @@ impl Matrix {
     ///     5.0, 4.0, 3.0, 2.0,
     /// );
     /// ```
+    #[allow(clippy::too_many_arguments)]
     pub fn square_4(
         v1: f64,
         v2: f64,

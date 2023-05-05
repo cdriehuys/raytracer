@@ -15,7 +15,7 @@ fn main() {
 
     let floor = {
         let mut floor = Plane::default();
-        floor.set_material(floor_material.clone());
+        floor.set_material(floor_material);
 
         floor
     };
@@ -61,8 +61,10 @@ fn main() {
         left
     };
 
-    let mut world = World::default();
-    world.objects = vec![&floor, &middle, &left, &right];
+    let world = World {
+        objects: vec![&floor, &middle, &left, &right],
+        ..Default::default()
+    };
 
     let camera = Camera::new(1000, 500, FRAC_PI_3).with_transform(view_transform(
         &Tuple::new_point(0.0, 1.5, -5.0),

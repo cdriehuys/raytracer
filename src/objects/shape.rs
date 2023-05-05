@@ -84,7 +84,7 @@ pub trait Shape: std::fmt::Debug {
     fn intersect(&self, ray: &Ray) -> Intersections {
         let local_ray = ray.transformed(&self.transform().inverted());
 
-        self.intersect_local(&&local_ray)
+        self.intersect_local(&local_ray)
     }
 
     /// Find the normal vector at a point on the object's surface.
@@ -102,7 +102,7 @@ pub trait Shape: std::fmt::Debug {
         let inverted_transform = self.transform().inverted();
 
         let local_point = &inverted_transform * *point;
-        let local_normal = self.normal_at_local(&&local_point);
+        let local_normal = self.normal_at_local(&local_point);
         let world_normal = &inverted_transform.transposed() * local_normal;
 
         // Since the proper calculations involve taking the submatrix containing
